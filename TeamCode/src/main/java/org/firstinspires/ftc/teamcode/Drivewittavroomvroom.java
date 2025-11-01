@@ -12,10 +12,10 @@ import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.MotorEx;
 
 @TeleOp(name = "Drive Witta Vroom Vroom")
-public class TeleOpProgram extends NextFTCOpMode {
-        public TeleOpProgram() {
+public class Drivewittavroomvroom extends NextFTCOpMode {
+        public Drivewittavroomvroom() {
             addComponents(
-                    new SubsystemComponent(Claw.INSTANCE),
+                    new SubsystemComponent(theclaw.INSTANCE),
                     BulkReadComponent.INSTANCE,
                     BindingsComponent.INSTANCE
             );
@@ -41,10 +41,10 @@ public class TeleOpProgram extends NextFTCOpMode {
 
             Gamepads.gamepad2().rightTrigger().greaterThan(0.2)
                     .whenBecomesTrue(
-                            Claw.INSTANCE.close
+                            theclaw.INSTANCE.close
                     );
             Gamepads.gamepad2().leftBumper().whenBecomesTrue(
-                    Claw.INSTANCE.open
+                    theclaw.INSTANCE.open
             );
         }
     }
