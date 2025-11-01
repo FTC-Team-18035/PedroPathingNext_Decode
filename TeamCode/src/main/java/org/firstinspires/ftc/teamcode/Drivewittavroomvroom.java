@@ -13,6 +13,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 
 @TeleOp(name = "Drive Witta Vroom Vroom")
 public class Drivewittavroomvroom extends NextFTCOpMode {
+    // Jasper
         public Drivewittavroomvroom() {
             addComponents(
                     new SubsystemComponent(theclaw.INSTANCE),
@@ -21,10 +22,10 @@ public class Drivewittavroomvroom extends NextFTCOpMode {
             );
         }
 
-        private final MotorEx frontLeftMotor = new MotorEx("front_left").reversed();
-        private final MotorEx frontRightMotor = new MotorEx("front_right");
-        private final MotorEx backLeftMotor = new MotorEx("back_left").reversed();
-        private final MotorEx backRightMotor = new MotorEx("back_right");
+        private final MotorEx frontLeftMotor = new MotorEx("Front Left").reversed();
+        private final MotorEx frontRightMotor = new MotorEx("Front Right");
+        private final MotorEx backLeftMotor = new MotorEx("Back Left").reversed();
+        private final MotorEx backRightMotor = new MotorEx("Back Right");
 
         @Override
         public void onStartButtonPressed() {
