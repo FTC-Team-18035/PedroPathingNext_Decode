@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.nextFTC;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
@@ -15,17 +16,17 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class Attempt1NextFtcTeleOp extends NextFTCOpMode {
     public Attempt1NextFtcTeleOp() {
         addComponents(
-                new SubsystemComponent(LiftSubSystem.INSTANCE),
+             //   new SubsystemComponent(LiftSubSystem.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );
     }
 
     // change the names and directions to suit your robot
-    private final MotorEx frontLeftMotor = new MotorEx("front_left");
-    private final MotorEx frontRightMotor = new MotorEx("front_right");
-    private final MotorEx backLeftMotor = new MotorEx("back_left");
-    private final MotorEx backRightMotor = new MotorEx("back_right");
+    private final MotorEx frontLeftMotor = new MotorEx("Front Left").reversed();
+    private final MotorEx frontRightMotor = new MotorEx("Front Right");
+    private final MotorEx backLeftMotor = new MotorEx("Back Left").reversed();
+    private final MotorEx backRightMotor = new MotorEx("Back Right");
 
     @Override
     public void onStartButtonPressed() {
@@ -40,7 +41,7 @@ public class Attempt1NextFtcTeleOp extends NextFTCOpMode {
         );
         driverControlled.schedule();
 
-        Gamepads.gamepad2().dpadUp()
+       /* Gamepads.gamepad2().dpadUp()
                 .whenBecomesTrue(
                         LiftSubSystem.INSTANCE.toHigh
                 );
@@ -52,6 +53,6 @@ public class Attempt1NextFtcTeleOp extends NextFTCOpMode {
 
         Gamepads.gamepad2().leftBumper().whenBecomesTrue(
                         LiftSubSystem.INSTANCE.toLow
-                );
+                );*/
     }
 }
