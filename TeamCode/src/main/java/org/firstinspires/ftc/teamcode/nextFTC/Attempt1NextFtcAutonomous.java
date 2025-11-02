@@ -17,24 +17,28 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 public class Attempt1NextFtcAutonomous extends NextFTCOpMode {
         public Attempt1NextFtcAutonomous() {
             addComponents(
-                    new SubsystemComponent(theclaw.INSTANCE, theclawIntake.INSTANCE),
+                    new SubsystemComponent(theclaw.INSTANCE, theclawIntake.INSTANCE, CRservoSubsytemTest.INSTANCE),
                     BulkReadComponent.INSTANCE
             );
         }
 
         private Command autonomousRoutine() {
             return new SequentialGroup(
-                    theclaw.INSTANCE.close,
+                    CRservoSubsytemTest.INSTANCE.go,
+                    new Delay(2),
                     new ParallelGroup(
-                            theclaw.INSTANCE.open,
+                            theclaw.INSTANCE.close,
                             theclawIntake.INSTANCE.close
                     ),
                     new Delay(.5),
                     new ParallelGroup(
-                            theclaw.INSTANCE.close,
+                            theclaw.INSTANCE.open,
+                            CRservoSubsytemTest.INSTANCE.stop,
                             theclawIntake.INSTANCE.open
 
-                    )
+                    ),
+                    new Delay(.5),
+                    CRservoSubsytemTest.INSTANCE.go
             );
         }
 

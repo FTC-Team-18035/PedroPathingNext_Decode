@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.nextFTC;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.theclaw;
+import org.firstinspires.ftc.teamcode.theclawIntake;
+
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -16,11 +19,12 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class Attempt1NextFtcTeleOp extends NextFTCOpMode {
     public Attempt1NextFtcTeleOp() {
         addComponents(
-             //   new SubsystemComponent(LiftSubSystem.INSTANCE),
+             new SubsystemComponent(CRservoSubsytemTest.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );
     }
+    private String telemetryValue = null;
 
     // change the names and directions to suit your robot
     private final MotorEx frontLeftMotor = new MotorEx("Front Left").reversed();
@@ -30,6 +34,7 @@ public class Attempt1NextFtcTeleOp extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
+        telemetry.addData("", telemetryValue);
         Command driverControlled = new MecanumDriverControlled(
                 frontLeftMotor,
                 frontRightMotor,
@@ -41,18 +46,29 @@ public class Attempt1NextFtcTeleOp extends NextFTCOpMode {
         );
         driverControlled.schedule();
 
-       /* Gamepads.gamepad2().dpadUp()
+       Gamepads.gamepad2().leftBumper()
                 .whenBecomesTrue(
-                        LiftSubSystem.INSTANCE.toHigh
+                        CRservoSubsytemTest.INSTANCE.stop
                 );
 
         Gamepads.gamepad2().rightTrigger().greaterThan(0.2)
                 .whenBecomesTrue(
-                        LiftSubSystem.INSTANCE.toMiddle
-                );
+                        CRservoSubsytemTest.INSTANCE.go
 
-        Gamepads.gamepad2().leftBumper().whenBecomesTrue(
-                        LiftSubSystem.INSTANCE.toLow
-                );*/
+                );
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.2)
+                .whenBecomesTrue(
+                        theclaw.INSTANCE.close
+                );
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(
+                theclaw.INSTANCE.open
+        );
+        Gamepads.gamepad1().x()
+                .whenBecomesTrue(
+                        theclawIntake.INSTANCE.close
+                );
+        Gamepads.gamepad1().b().whenBecomesTrue(
+                theclawIntake.INSTANCE.open
+        );
     }
 }
