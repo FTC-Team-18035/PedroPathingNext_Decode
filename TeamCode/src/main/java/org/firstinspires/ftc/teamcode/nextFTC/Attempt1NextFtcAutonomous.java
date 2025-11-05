@@ -22,7 +22,7 @@ public class Attempt1NextFtcAutonomous extends NextFTCOpMode {
             );
         }
 
-        private Command autonomousRoutine() {
+        public Command autonomousRoutine() {
             return new SequentialGroup(
                     CRservoSubsytemTest.INSTANCE.go,
                     new Delay(2),
