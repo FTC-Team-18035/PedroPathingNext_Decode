@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.nextFTC;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.nextFTC.subsytems.LiftSubSystem;
-import org.firstinspires.ftc.teamcode.nextFTC.subsytems.theclaw;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
