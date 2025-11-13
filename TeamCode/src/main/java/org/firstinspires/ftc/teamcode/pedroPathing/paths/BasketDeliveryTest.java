@@ -24,8 +24,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
-@Disabled
-@Autonomous(name = "Basket Auto")
+
+@Autonomous(name = "Basket Auto with NextFtc")
 public class BasketDeliveryTest extends NextFTCOpMode {
 
     public BasketDeliveryTest() {
@@ -348,6 +348,7 @@ public class BasketDeliveryTest extends NextFTCOpMode {
         pathTimer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
+        actionTimer = new Timer();
 
         follower().setStartingPose(startPos);
         buildPaths();

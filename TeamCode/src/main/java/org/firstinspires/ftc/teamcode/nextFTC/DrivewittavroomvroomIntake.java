@@ -1,6 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.nextFTC;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.nextFTC.subsytems.theclawIntake;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
@@ -11,12 +13,12 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.MotorEx;
 
-@TeleOp(name = "Drive Witta Vroom Vroom")
-public class Drivewittavroomvroom extends NextFTCOpMode {
+@TeleOp(name = "Drive Witta Vroom Vroom Intake")
+public class DrivewittavroomvroomIntake extends NextFTCOpMode {
     // Jasper //
-        public Drivewittavroomvroom() {
+        public DrivewittavroomvroomIntake() {
             addComponents(
-                    new SubsystemComponent(theclaw.INSTANCE),
+                    new SubsystemComponent(theclawIntake.INSTANCE),
                     BulkReadComponent.INSTANCE,
                     BindingsComponent.INSTANCE
             );
@@ -40,12 +42,12 @@ public class Drivewittavroomvroom extends NextFTCOpMode {
             );
             driverControlled.schedule();
 
-            Gamepads.gamepad2().rightTrigger().greaterThan(0.2)
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.2)
                     .whenBecomesTrue(
-                            theclaw.INSTANCE.close
+                            theclawIntake.INSTANCE.close
                     );
-            Gamepads.gamepad2().leftBumper().whenBecomesTrue(
-                    theclaw.INSTANCE.open
+            Gamepads.gamepad1().leftBumper().whenBecomesTrue(
+                    theclawIntake.INSTANCE.open
             );
         }
     }

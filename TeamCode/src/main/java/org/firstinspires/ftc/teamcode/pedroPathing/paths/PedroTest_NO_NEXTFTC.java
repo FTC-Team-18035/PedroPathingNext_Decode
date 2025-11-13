@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-@Autonomous(name = "2 Sample Basket", group = "Main")
+@Autonomous(name = "NO NEXTFTC", group = "Main")
 public class PedroTest_NO_NEXTFTC extends OpMode {
 
         private Follower follower;
@@ -106,9 +106,6 @@ public class PedroTest_NO_NEXTFTC extends OpMode {
 
             lineupSample3 = new Path(new BezierLine((sample3Pose), (lineupPos)));
             lineupSample3.setLinearHeadingInterpolation(sample3Pose.getHeading(), lineupPos.getHeading());
-
-            park = new Path(new BezierCurve(sample1Pos));
-            park.setLinearHeadingInterpolation(sample1Pos.getHeading(), parkPose1.getHeading());
 
             pullForwardsPath = new Path(new BezierLine((scorePose), (sample1Pos)));
             pullForwardsPath.setLinearHeadingInterpolation(scorePose.getHeading(), sample1Pos.getHeading());

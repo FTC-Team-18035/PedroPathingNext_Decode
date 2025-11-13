@@ -2,8 +2,9 @@ package org.firstinspires.ftc.teamcode.nextFTC;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.theclaw;
-import org.firstinspires.ftc.teamcode.theclawIntake;
+import org.firstinspires.ftc.teamcode.nextFTC.subsytems.CRservoSubsytemTest;
+import org.firstinspires.ftc.teamcode.nextFTC.subsytems.theclaw;
+import org.firstinspires.ftc.teamcode.nextFTC.subsytems.theclawIntake;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -22,19 +23,34 @@ public class Attempt1NextFtcAutonomous extends NextFTCOpMode {
             );
         }
 
-        public Command autonomousRoutine() {
+    @Override
+    public void onInit() {
+            theclaw.INSTANCE.initialize();
+            theclawIntake.INSTANCE.initialize();
+    }
+
+    private Command autonomousRoutine() {
             return new SequentialGroup(
                     CRservoSubsytemTest.INSTANCE.go,
                     new Delay(2),
+                    CRservoSubsytemTest.INSTANCE.stop,
+                    theclaw.INSTANCE.open,
+                    new Delay(2),
+                    theclaw.INSTANCE.close,
+                    theclawIntake.INSTANCE.open,
+                    new Delay(2),
+                    theclawIntake.INSTANCE.close,
+                    new Delay(5),
                     new ParallelGroup(
-                            theclaw.INSTANCE.close,
-                            theclawIntake.INSTANCE.close
+                            theclaw.INSTANCE.open,
+                            theclawIntake.INSTANCE.open,
+                            CRservoSubsytemTest.INSTANCE.go
                     ),
                     new Delay(.5),
                     new ParallelGroup(
-                            theclaw.INSTANCE.open,
+                            theclaw.INSTANCE.close,
                             CRservoSubsytemTest.INSTANCE.stop,
-                            theclawIntake.INSTANCE.open
+                            theclawIntake.INSTANCE.close
 
                     ),
                     new Delay(.5),
