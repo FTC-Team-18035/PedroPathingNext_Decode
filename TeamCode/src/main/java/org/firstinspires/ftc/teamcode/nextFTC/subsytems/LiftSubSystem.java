@@ -10,16 +10,16 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class LiftSubSystem implements Subsystem {
     public static final LiftSubSystem INSTANCE = new LiftSubSystem();
     private LiftSubSystem() { }
+    private MotorEx motor = new MotorEx("lift");  // changed to SERQET name
 
-    private MotorEx motor = new MotorEx("lift_motor");
-
+    // TODO - tune PID
     private ControlSystem controlSystem = ControlSystem.builder()
             .posPid(0, 0, 0)
             .elevatorFF(0)
             .build();
-
-    public Command toLow = new RunToPosition(controlSystem, 0).requires(this);
-    public Command toMiddle = new RunToPosition(controlSystem, 500).requires(this);
+    // TODO - determine correct encoder value
+    // public Command toLow = new RunToPosition(controlSystem, 0).requires(this);
+    // public Command toMiddle = new RunToPosition(controlSystem, 500).requires(this);
     public Command toHigh = new RunToPosition(controlSystem, 1200).requires(this);
 
     @Override
