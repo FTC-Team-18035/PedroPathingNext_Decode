@@ -23,13 +23,15 @@ public class DrivewittavroomvroomSerqet extends NextFTCOpMode {
             );
         }
 
+        private double power = 0;
+
         private final MotorEx frontLeftMotor = new MotorEx("front_left").reversed();
         private final MotorEx frontRightMotor = new MotorEx("front_right");
         private final MotorEx backLeftMotor = new MotorEx("back_left").reversed();
         private final MotorEx backRightMotor = new MotorEx("back_right");
 
         private final MotorEx leftShooter = new MotorEx("left_shooter");
-        private final MotorEx rightShooter = new MotorEx("right_shooter");
+        private final MotorEx rightShooter = new MotorEx("right_shooter").reversed();
 
         @Override
         public void onStartButtonPressed() {
@@ -43,18 +45,32 @@ public class DrivewittavroomvroomSerqet extends NextFTCOpMode {
                     Gamepads.gamepad1().rightStickX()
             );
             driverControlled.schedule();
+
+            telemetry.addData("Shooter Power", power);
         }
 
         @Override
         public void onUpdate() {
             if (gamepad1.a) {
-                leftShooter.setPower(-1);
-                rightShooter.setPower(1);
+                power = .25;
+            }
+            else if (gamepad1.b) {
+                power = .5;
+            }
+            else if (gamepad1.y) {
+                power = .75;
+            }
+            else if (gamepad1.x) {
+                power = 1;
             }
             else {
-                leftShooter.setPower(0);
-                rightShooter.setPower(0);
+                power = 0;
             }
+
+            rightShooter.setPower(power);
+            leftShooter.setPower(power);
+
+            telemetry.update();
         }
     }
 

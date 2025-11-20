@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsytems.Shooter;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;

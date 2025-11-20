@@ -13,13 +13,14 @@ import org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems.thecla
 import org.firstinspires.ftc.teamcode.JD_Code.limelight.pedroPathing.Constants;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
-@Disabled
 @Autonomous(name = "Pedro NextFtc Test")
 public class NextFtcPedroTest_New extends NextFTCOpMode {
    public NextFtcPedroTest_New() {
@@ -50,9 +51,15 @@ public class NextFtcPedroTest_New extends NextFTCOpMode {
     public Command autonomousPathUpdate() {
             return new SequentialGroup(
                 new FollowPath(driveForward),
-
-                theclawIntake.INSTANCE.open,
-
+                new ParallelGroup(
+                    theclawIntake.INSTANCE.open,
+                        CRservoSubsytemTest.INSTANCE.go
+                        ),
+                new Delay(3),
+                new ParallelGroup(
+                    theclawIntake.INSTANCE.close,
+                        CRservoSubsytemTest.INSTANCE.stop
+                        ),
                 new FollowPath(driveBackward)
                 );
     }

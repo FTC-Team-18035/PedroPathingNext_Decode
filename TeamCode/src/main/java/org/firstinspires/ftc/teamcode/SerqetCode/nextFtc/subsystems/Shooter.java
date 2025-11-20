@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsytems;
+package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;

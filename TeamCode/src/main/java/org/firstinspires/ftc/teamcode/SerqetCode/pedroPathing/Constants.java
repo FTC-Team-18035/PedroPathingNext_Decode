@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.SerqetCode.pedropathing;
+package org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;

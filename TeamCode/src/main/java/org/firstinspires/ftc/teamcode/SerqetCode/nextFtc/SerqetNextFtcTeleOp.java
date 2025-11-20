@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.VaultSubsystem;
 
 import dev.nextftc.bindings.BindingManager;
@@ -74,11 +75,16 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
         Gamepads.gamepad1().dpadUp().whenBecomesTrue(
                         LiftSubsystem.INSTANCE.toHigh
                 );                                          // Bind LIFT activation to button
-        /*
+
+        //TODO Figure out Trajectory. We need Limelight feedback for trajectory and shooting.
+        //TODO Have PinPoint hold position Pedro?
+        //TODO Hit Shoot use limelight for feedback, if we get pushed move back, then shoot
         Gamepads.gamepad1().a().whenBecomesTrue(
-                                                            // Here could be the commands to hold position via Pinpoint and Pedro?
+                        Shooter.INSTANCE.shoot              // Here could be the commands to hold position via Pinpoint and Pedro?
+        ).whenBecomesFalse(
+                Shooter.INSTANCE.stop
         );                                                  // Bind SHOOTER activation to button
-        */
+
         Gamepads.gamepad1().rightBumper().whenTrue(
                        IntakeSubsystem.INSTANCE.run.and(
                        VaultSubsystem.INSTANCE.intake)
