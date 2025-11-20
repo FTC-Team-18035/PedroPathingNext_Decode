@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems;
+package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems;
 
 
 import dev.nextftc.control.ControlSystem;
@@ -7,9 +7,9 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.controllable.RunToPosition;
 import dev.nextftc.hardware.impl.MotorEx;
 
-public class LiftSubSystem implements Subsystem {
-    public static final LiftSubSystem INSTANCE = new LiftSubSystem();
-    private LiftSubSystem() { }
+public class LiftSubsystem implements Subsystem {
+    public static final LiftSubsystem INSTANCE = new LiftSubsystem();
+    private LiftSubsystem() { }
     private MotorEx motor = new MotorEx("lift");  // changed to SERQET name
 
     // TODO - tune PID
