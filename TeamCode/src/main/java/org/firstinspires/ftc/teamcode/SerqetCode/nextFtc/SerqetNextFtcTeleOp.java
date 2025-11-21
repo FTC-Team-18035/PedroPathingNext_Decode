@@ -80,7 +80,7 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
         //TODO Have PinPoint hold position Pedro?
         //TODO Hit Shoot use limelight for feedback, if we get pushed move back, then shoot
         Gamepads.gamepad1().a().whenBecomesTrue(
-                        Shooter.INSTANCE.shoot              // Here could be the commands to hold position via Pinpoint and Pedro?
+                        Shooter.INSTANCE.shoot(1)              // Here could be the commands to hold position via Pinpoint and Pedro?
         ).whenBecomesFalse(
                 Shooter.INSTANCE.stop
         );                                                  // Bind SHOOTER activation to button

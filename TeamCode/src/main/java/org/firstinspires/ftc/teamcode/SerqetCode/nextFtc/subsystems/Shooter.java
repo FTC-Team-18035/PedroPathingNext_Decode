@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.controllable.MotorGroup;
+import dev.nextftc.hardware.controllable.RunToVelocity;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
@@ -17,7 +18,11 @@ public class Shooter implements Subsystem {
             new MotorEx("right_shooter").reversed()
     );
 
-    public Command shoot = new SetPower(shooterGroup, .5).requires(this);
+
+    public Command shoot(double trajectory) {
+        return new SetPower(shooterGroup, trajectory).requires(this);
+    }
+
 
     public Command stop = new SetPower(shooterGroup, 0).requires(this);
 }

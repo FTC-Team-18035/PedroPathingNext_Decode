@@ -43,7 +43,7 @@ public class SerqetMain extends NextFTCOpMode {
 
         Gamepads.gamepad1().dpadUp()
                 .whenBecomesTrue(
-                        Shooter.INSTANCE.shoot // Error Here
+                        Shooter.INSTANCE.shoot(1) // Error Here
                 );
 
 
