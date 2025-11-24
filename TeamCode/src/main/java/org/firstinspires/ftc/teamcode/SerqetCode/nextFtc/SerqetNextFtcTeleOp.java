@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.VaultSubsyst
 import dev.nextftc.bindings.BindingManager;
 import dev.nextftc.bindings.Button;
 import dev.nextftc.bindings.Variable;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
@@ -44,6 +46,12 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
 
     // private IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed()    // needed for Pedro field centric
     public double dtScale = 1;
+
+    @Override
+    public void onInit()  {                     // set LIFT to hold the hold the lift
+        final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
+        holdClear.schedule();
+    }
 
 
     @Override
@@ -81,9 +89,9 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
         //TODO Hit Shoot use limelight for feedback, if we get pushed move back, then shoot
         Gamepads.gamepad1().a().whenBecomesTrue(
                         Shooter.INSTANCE.shoot(1)              // Here could be the commands to hold position via Pinpoint and Pedro?
-        ).whenBecomesFalse(
-                Shooter.INSTANCE.stop
-        );                                                  // Bind SHOOTER activation to button
+                ).whenBecomesFalse(
+                        Shooter.INSTANCE.stop
+                );                                                  // Bind SHOOTER activation to button
 
         Gamepads.gamepad1().rightBumper().whenTrue(
                        IntakeSubsystem.INSTANCE.run.and(

@@ -13,14 +13,16 @@ public class LiftSubsystem implements Subsystem {
     private MotorEx motor = new MotorEx("lift");  // changed to SERQET name
 
     // TODO - tune PID
-    private ControlSystem controlSystem = ControlSystem.builder()
+        private ControlSystem controlSystem = ControlSystem.builder()
             .posPid(0, 0, 0)
             .elevatorFF(0)
             .build();
     // TODO - determine correct encoder value
-    // public Command toLow = new RunToPosition(controlSystem, 0).requires(this);
-    // public Command toMiddle = new RunToPosition(controlSystem, 500).requires(this);
-    public Command toHigh = new RunToPosition(controlSystem, 1200).requires(this);
+    public Command holdClear = new RunToPosition(controlSystem, 0).requires(this); // hold plate up for driving
+    public Command toHigh = new RunToPosition(controlSystem, 1200).requires(this); // engage lift for parking
+
+    @Override
+    public void initialize() { motor.setPower(controlSystem.calculate(motor.getState())); }
 
     @Override
     public void periodic() {
