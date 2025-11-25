@@ -49,7 +49,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 */
 
 
-@TeleOp(name = "Serqet Lift/Intake/Vault TeleOp")
+@TeleOp(name = "Serqet Lift/Intake/Vault/ Limelight TeleOp")
 
 public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     public SerqetNextFtcTeleOpLimelight() {
@@ -78,8 +78,8 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     // Actions to take when opmode is INITIALIZED
     @Override
     public void onInit()  {                     // set LIFT to hold the hold the lift
-        final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
-        holdClear.schedule();
+        // final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
+        // holdClear.schedule();
         llInitialize();
     }
 
