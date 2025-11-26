@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
+
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
@@ -10,18 +12,21 @@ import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
 import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 
+@Configurable
 public class Shooter implements Subsystem {
 
     public static final Shooter INSTANCE = new Shooter();
     public static double targetDistance = 0;
     private Shooter() { }
 
+    public static int MAGIC_NUMBER = 32;
+
     // Declare servos and motors
     private final ServoEx servoVertical = new ServoEx("shooter_vertical");
     private final ServoEx servoHorizontal = new ServoEx("shooter_horizontal");
     private MotorGroup shooterGroup = new MotorGroup(
-            new MotorEx("left_shooter"),
-            new MotorEx("right_shooter").reversed());
+            new MotorEx("left_shooter").reversed(),
+            new MotorEx("right_shooter"));
 
     // PID for the shooter motors
     // TODO - program servos

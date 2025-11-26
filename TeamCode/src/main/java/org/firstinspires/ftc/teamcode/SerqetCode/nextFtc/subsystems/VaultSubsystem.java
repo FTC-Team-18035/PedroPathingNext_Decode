@@ -13,9 +13,9 @@ public class VaultSubsystem implements Subsystem {
     private CRServoEx vaultFeed = new CRServoEx( "vault_feed");
     private ServoEx vaultRelease = new ServoEx( "vault_release");
 
-    public Command intake = new SetPosition(vaultRelease, 0).requires(this).then(
+    public Command intake = new SetPosition(vaultRelease, 0).requires(this).and(
             new SetPower(vaultFeed, 1).requires(this));
-    public Command outtake = new SetPosition(vaultRelease,1).requires(this).then(
+    public Command outtake = new SetPosition(vaultRelease,1).requires(this).and(
            new SetPower(vaultFeed,1).requires(this));
 
     public Command run = new SetPower(vaultFeed, 1).requires(this);

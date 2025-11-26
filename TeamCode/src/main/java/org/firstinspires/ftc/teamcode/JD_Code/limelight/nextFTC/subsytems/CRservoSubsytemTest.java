@@ -9,8 +9,8 @@ public class CRservoSubsytemTest implements Subsystem {
     public static final CRservoSubsytemTest INSTANCE = new CRservoSubsytemTest();
     private CRservoSubsytemTest() { }
 
-    private CRServoEx servo = new CRServoEx("testcr");
+    private CRServoEx servo = new CRServoEx("vault_feed");
 
-    public Command go = new SetPower(servo, 1).requires(this);
+    public Command go = new SetPower(servo, -1).requires(this);
     public Command stop = new SetPower(servo, 0).requires(this);
 }

@@ -102,9 +102,9 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
 
         // Bind shooting actions to gampad1.a
         button(() -> gamepad1.a)
-                .whenBecomesTrue(Shooter.INSTANCE.spinup)               // may not be helpful - a delay in shoot command (Subsystem level) may be best
+                .whenTrue(Shooter.INSTANCE.spinup)               // may not be helpful - a delay in shoot command (Subsystem level) may be best
                 .whenTrue(Shooter.INSTANCE.shoot(5,.1, 0)
-                        .then(VaultSubsystem.INSTANCE.outtake))
+                        .and(VaultSubsystem.INSTANCE.outtake))
                 // TODO - how to trigger Limelight read/Trajectory calculation and pass
                 // TODO - Have PinPoint hold position Pedro?
                 .whenBecomesFalse(VaultSubsystem.INSTANCE.stop)
