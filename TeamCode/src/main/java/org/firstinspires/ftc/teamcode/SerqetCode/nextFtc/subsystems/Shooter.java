@@ -41,7 +41,7 @@ public class Shooter implements Subsystem {
     public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {                   // feed calculated values into motor control and servos
         return new SetPosition(servoHorizontal,aimAngle).requires(servoHorizontal)          // servo angle adjustment
                 .and(new SetPosition(servoVertical, launchAngle).requires(servoVertical))   // may need a delay here ???
-                .then(new RunToVelocity(controller, launchVelocity).requires(this));
+                .and(new RunToVelocity(controller, launchVelocity).requires(this));
     }
     // command to spin up shooter motors
     public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.1);  // initial spin up command (with delay) that may not be neede
