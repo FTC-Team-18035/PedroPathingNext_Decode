@@ -10,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems.CRservoSubsytemTest;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
@@ -49,15 +50,16 @@ import dev.nextftc.hardware.impl.MotorEx;
 */
 
 
-@TeleOp(name = "Serqet Lift/Intake/Vault/ Limelight TeleOp")
+@TeleOp(name = "Serqet Lift/Intake/Vault TeleOp Limelight")
 
 public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     public SerqetNextFtcTeleOpLimelight() {
         addComponents(
              new SubsystemComponent(LiftSubsystem.INSTANCE),    // enable LIFT system
              new SubsystemComponent(IntakeSubsystem.INSTANCE),    // enable INTAKE system
-             new SubsystemComponent(VaultSubsystem.INSTANCE),    // enable VAULT system
+             //new SubsystemComponent(VaultSubsystem.INSTANCE),    // enable VAULT system
              new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
+             new SubsystemComponent(CRservoSubsytemTest.INSTANCE),
 
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
@@ -66,20 +68,21 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     private String telemetryValue = null;
 
     // Names for DECODE season robot SERQET
+    // CHASSIS motor directions verified 11/25/25
     private Limelight3A limelight;
-    private final MotorEx frontLeft = new MotorEx("front_left").reversed();
-    private final MotorEx frontRight = new MotorEx("front_right");
-    private final MotorEx backLeft = new MotorEx("back_left").reversed();
-    private final MotorEx backRight = new MotorEx("back_right");
+    private final MotorEx frontLeft = new MotorEx("front_left");
+    private final MotorEx frontRight = new MotorEx("front_right").reversed();
+    private final MotorEx backLeft = new MotorEx("back_left");
+    private final MotorEx backRight = new MotorEx("back_right").reversed();
     private IMUEx pinpoint = new IMUEx("pinpoint", Direction.UP, Direction.FORWARD).zeroed();    // needed for Pedro field centric
-    public double dtScale = 0.5; // Drivetrain scalar variable to set default to half power
+    public double dtScale = 0.6; // Drivetrain scalar variable to set default to half+ power
     public int aprilTag;
 
     // Actions to take when opmode is INITIALIZED
     @Override
     public void onInit()  {                     // set LIFT to hold the hold the lift
-        // final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
-        // holdClear.schedule();
+        final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
+        holdClear.schedule();
         llInitialize();
     }
 
@@ -88,7 +91,6 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     public void onStartButtonPressed() {
         telemetry.addData("", telemetryValue);
         // enable CHASSIS
-        // TODO - determine motor directions for proper operation
         DriverControlledCommand driverControlled = new MecanumDriverControlled(
                 frontLeft,
                 frontRight,
@@ -102,23 +104,28 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
         driverControlled.setScalar(dtScale);
         driverControlled.schedule();
 
+        // TODO - test TURBO button feature moved to onUpdate()
         // Bind TurboMode to left trigger
         // this is trickier since the trigger(supplier) isn't a boolean
+        /* FEATURE MOVED TO onUpdate()
         Variable<Float> left_trigger = variable(() -> gamepad1.left_trigger);
         Button turboButton = left_trigger.asButton(value -> value > 0.5); // true when left trigger is positive.
-        turboButton                                                     // TURBO mode but it's variable
-                .whenTrue(() -> dtScale = (gamepad1.left_trigger))      // Lambda command to set trigger value to be the drivetrain scalar value
-                .whenBecomesFalse(() -> dtScale = 0.5);                 // default to half power
+        turboButton                                                       // TURBO mode but it's variable
+                .whenTrue(() -> dtScale = 1)//(gamepad1.left_trigger))    // Lambda command to set trigger value to be the drivetrain scalar value
+                  .and(driverControlled.setScalar(dtScale))               // issue update scalar command
 
+                .whenBecomesFalse(() -> dtScale = 0.5)                    // default to half power
+                   .and(driverControlled.setScalar(dtScale));             // issue update scalar command
+        */
 
         // Bind shooting actions to gampad1.a
-        button(() -> gamepad1.a)
-                .whenBecomesTrue(Shooter.INSTANCE.spinup)               // may not be helpful - a delay in shoot command (Subsystem level) may be best
-                .whenTrue(Shooter.INSTANCE.shoot(5,.1, 0)
-                        .then(VaultSubsystem.INSTANCE.outtake))
+        button(() -> gamepad1.left_bumper)
+                .whenTrue(Shooter.INSTANCE.spinup)               // may not be helpful - a delay in shoot command (Subsystem level) may be best
+                .whenTrue(Shooter.INSTANCE.shoot(5,.1, 0))
+                        //.and(VaultSubsystem.INSTANCE.outtake))
                 // TODO - how to trigger Limelight read/Trajectory calculation and pass
                 // TODO - Have PinPoint hold position Pedro?
-                .whenBecomesFalse(VaultSubsystem.INSTANCE.stop)
+                //.whenBecomesFalse(VaultSubsystem.INSTANCE.stop)
                 .whenFalse(Shooter.INSTANCE.stop);
 
         // Bind LIFT activation to button
@@ -128,9 +135,11 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
         // Bind INTAKE actions to button
         button(() -> gamepad1.right_bumper)
                 .whenTrue(IntakeSubsystem.INSTANCE.run
-                    .and(VaultSubsystem.INSTANCE.intake))               // activate INTAKE and VAULT for getting artifacts
+                                .and(CRservoSubsytemTest.INSTANCE.go))
+                    //.and(VaultSubsystem.INSTANCE.intake))           // activate INTAKE and VAULT for getting artifacts
                 .whenFalse(IntakeSubsystem.INSTANCE.stop
-                    .and(VaultSubsystem.INSTANCE.stop));                // de-activate INTAKE and VAULT
+                                .and(CRservoSubsytemTest.INSTANCE.stop));
+                                //.and(VaultSubsystem.INSTANCE.stop));                // de-activate INTAKE and VAULT
     }
 
 
@@ -139,6 +148,36 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     public void onUpdate() {            // code to run during loop()
         // in loop(), or in NextFTC, onUpdate():
         BindingManager.update();        // this is what checks for the gamepad input during loop
+        // Attempt TURBO in this section
+        if(gamepad1.left_trigger > 0.25) {
+            DriverControlledCommand driverControlled = new MecanumDriverControlled(
+                    frontLeft,
+                    frontRight,
+                    backLeft,
+                    backRight,
+                    Gamepads.gamepad1().leftStickY().negate(),
+                    Gamepads.gamepad1().leftStickX(),
+                    Gamepads.gamepad1().rightStickX()
+                    // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
+            );
+            driverControlled.setScalar(1);
+            driverControlled.schedule();
+        }
+        else {
+            DriverControlledCommand driverControlled = new MecanumDriverControlled(
+                frontLeft,
+                frontRight,
+                backLeft,
+                backRight,
+                Gamepads.gamepad1().leftStickY().negate(),
+                Gamepads.gamepad1().leftStickX(),
+                Gamepads.gamepad1().rightStickX()
+                // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
+            );
+            driverControlled.setScalar(0.6);
+            driverControlled.schedule();
+        }
+
 
     }
 
