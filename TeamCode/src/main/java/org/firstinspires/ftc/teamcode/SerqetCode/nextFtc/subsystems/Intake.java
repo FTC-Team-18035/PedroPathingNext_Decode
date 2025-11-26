@@ -5,9 +5,9 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
-public class IntakeSubsystem implements Subsystem {
-        public static final IntakeSubsystem INSTANCE = new IntakeSubsystem();
-        private IntakeSubsystem() { }
+public class Intake implements Subsystem {
+        public static final Intake INSTANCE = new Intake();
+        private Intake() { }
 
         private MotorEx motor = new MotorEx("intake");
 

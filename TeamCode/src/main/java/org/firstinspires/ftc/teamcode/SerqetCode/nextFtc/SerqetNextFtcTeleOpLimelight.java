@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import static dev.nextftc.bindings.Bindings.button;
-import static dev.nextftc.bindings.Bindings.variable;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -11,16 +10,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems.CRservoSubsytemTest;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.VaultSubsystem;
 
 import java.util.List;
 
 import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.bindings.Button;
-import dev.nextftc.bindings.Variable;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -55,8 +51,8 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     public SerqetNextFtcTeleOpLimelight() {
         addComponents(
-             new SubsystemComponent(LiftSubsystem.INSTANCE),    // enable LIFT system
-             new SubsystemComponent(IntakeSubsystem.INSTANCE),    // enable INTAKE system
+             new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
+             new SubsystemComponent(Intake.INSTANCE),    // enable INTAKE system
              //new SubsystemComponent(VaultSubsystem.INSTANCE),    // enable VAULT system
              new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
              new SubsystemComponent(CRservoSubsytemTest.INSTANCE),
@@ -81,7 +77,7 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     // Actions to take when opmode is INITIALIZED
     @Override
     public void onInit()  {                     // set LIFT to hold the hold the lift
-        final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
+        final Command holdClear = Lift.INSTANCE.holdClear;
         holdClear.schedule();
         llInitialize();
     }
@@ -130,14 +126,14 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
 
         // Bind LIFT activation to button
         button(() -> gamepad1.dpad_up)
-                .whenBecomesTrue(LiftSubsystem.INSTANCE.toHigh);        // Parking action to raise lift
+                .whenBecomesTrue(Lift.INSTANCE.toHigh);        // Parking action to raise lift
 
         // Bind INTAKE actions to button
         button(() -> gamepad1.right_bumper)
-                .whenTrue(IntakeSubsystem.INSTANCE.run
+                .whenTrue(Intake.INSTANCE.run
                                 .and(CRservoSubsytemTest.INSTANCE.go))
                     //.and(VaultSubsystem.INSTANCE.intake))           // activate INTAKE and VAULT for getting artifacts
-                .whenFalse(IntakeSubsystem.INSTANCE.stop
+                .whenFalse(Intake.INSTANCE.stop
                                 .and(CRservoSubsytemTest.INSTANCE.stop));
                                 //.and(VaultSubsystem.INSTANCE.stop));                // de-activate INTAKE and VAULT
     }

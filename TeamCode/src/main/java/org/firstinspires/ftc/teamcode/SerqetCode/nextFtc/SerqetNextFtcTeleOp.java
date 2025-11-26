@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.VaultSubsystem;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Vault;
 
 import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.bindings.Button;
-import dev.nextftc.bindings.Variable;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -46,9 +44,9 @@ import static dev.nextftc.bindings.Bindings.*;
 public class SerqetNextFtcTeleOp extends NextFTCOpMode {
     public SerqetNextFtcTeleOp() {
         addComponents(
-             new SubsystemComponent(LiftSubsystem.INSTANCE),    // enable LIFT system
-             new SubsystemComponent(IntakeSubsystem.INSTANCE),    // enable INTAKE system
-             new SubsystemComponent(VaultSubsystem.INSTANCE),    // enable VAULT system
+             new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
+             new SubsystemComponent(Intake.INSTANCE),    // enable INTAKE system
+             new SubsystemComponent(Vault.INSTANCE),    // enable VAULT system
              new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
 
                 BulkReadComponent.INSTANCE,
@@ -69,7 +67,7 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
     // Actions to take when opmode is INITIALIZED
     @Override
     public void onInit()  {                     // set LIFT to hold the hold the lift
-        final Command holdClear = LiftSubsystem.INSTANCE.holdClear;
+        final Command holdClear = Lift.INSTANCE.holdClear;
         holdClear.schedule();
     }
 
@@ -110,22 +108,22 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
         button(() -> gamepad1.a)
                 .whenTrue(Shooter.INSTANCE.spinup)               // may not be helpful - a delay in shoot command (Subsystem level) may be best
                 .whenTrue(Shooter.INSTANCE.shoot(5,.1, 0)
-                        .and(VaultSubsystem.INSTANCE.outtake))
+                        .and(Vault.INSTANCE.outtake))
                 // TODO - how to trigger Limelight read/Trajectory calculation and pass
                 // TODO - Have PinPoint hold position Pedro?
-                .whenBecomesFalse(VaultSubsystem.INSTANCE.stop)
+                .whenBecomesFalse(Vault.INSTANCE.stop)
                 .whenFalse(Shooter.INSTANCE.stop);
 
         // Bind LIFT activation to button
         button(() -> gamepad1.dpad_up)
-                .whenBecomesTrue(LiftSubsystem.INSTANCE.toHigh);        // Parking action to raise lift
+                .whenBecomesTrue(Lift.INSTANCE.toHigh);        // Parking action to raise lift
 
         // Bind INTAKE actions to button
         button(() -> gamepad1.right_bumper)
-                .whenTrue(IntakeSubsystem.INSTANCE.run
-                    .and(VaultSubsystem.INSTANCE.intake))               // activate INTAKE and VAULT for getting artifacts
-                .whenFalse(IntakeSubsystem.INSTANCE.stop
-                    .and(VaultSubsystem.INSTANCE.stop));                // de-activate INTAKE and VAULT
+                .whenTrue(Intake.INSTANCE.run
+                    .and(Vault.INSTANCE.intake))               // activate INTAKE and VAULT for getting artifacts
+                .whenFalse(Intake.INSTANCE.stop
+                    .and(Vault.INSTANCE.stop));                // de-activate INTAKE and VAULT
     }
 
 

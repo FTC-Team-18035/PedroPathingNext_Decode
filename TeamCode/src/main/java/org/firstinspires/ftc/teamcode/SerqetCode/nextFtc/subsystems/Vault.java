@@ -7,9 +7,9 @@ import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
 import dev.nextftc.hardware.powerable.SetPower;
 
-public class VaultSubsystem implements Subsystem {
-    public static final VaultSubsystem INSTANCE = new VaultSubsystem();
-    private VaultSubsystem() {}
+public class Vault implements Subsystem {
+    public static final Vault INSTANCE = new Vault();
+    private Vault() {}
     private CRServoEx vaultFeed = new CRServoEx( "vault_feed");
     private ServoEx vaultRelease = new ServoEx( "vault_release");
 

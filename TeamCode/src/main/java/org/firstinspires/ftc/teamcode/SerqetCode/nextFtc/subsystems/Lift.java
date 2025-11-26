@@ -7,15 +7,15 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.controllable.RunToPosition;
 import dev.nextftc.hardware.impl.MotorEx;
 
-public class LiftSubsystem implements Subsystem {
-    public static final LiftSubsystem INSTANCE = new LiftSubsystem();
-    private LiftSubsystem() { }
+public class Lift implements Subsystem {
+    public static final Lift INSTANCE = new Lift();
+    private Lift() { }
     private MotorEx motor = new MotorEx("lift");  // changed to SERQET name
 
     // TODO - tune PID
         private ControlSystem controlSystem = ControlSystem.builder()
-            .posPid(0, 0, 0)
-            .elevatorFF(0)
+            .posPid(0.015, 0, 0.0002)
+            .elevatorFF(0.04)
             .build();
     // TODO - determine correct encoder value
     public Command holdClear = new RunToPosition(controlSystem, 0).requires(this); // hold plate up for driving
