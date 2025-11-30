@@ -12,7 +12,8 @@ public class Lift implements Subsystem {
     private Lift() { }
     private MotorEx motor = new MotorEx("lift");  // changed to SERQET name
 
-    // TODO - tune PID
+
+    // TODO - tune PID - may be able to make contructor public static
         private ControlSystem controlSystem = ControlSystem.builder()
             .posPid(0.015, 0, 0.0002)
             .elevatorFF(0.04)
@@ -22,10 +23,16 @@ public class Lift implements Subsystem {
     public Command toHigh = new RunToPosition(controlSystem, 1200).requires(this); // engage lift for parking
 
     @Override
-    public void initialize() { motor.setPower(controlSystem.calculate(motor.getState())); }
+    public void initialize() {
+        new RunToPosition(controlSystem, 0);
+        motor.setPower(controlSystem.calculate(motor.getState()));
+
+    }
 
     @Override
     public void periodic() {
         motor.setPower(controlSystem.calculate(motor.getState()));
     }
+
+
 }

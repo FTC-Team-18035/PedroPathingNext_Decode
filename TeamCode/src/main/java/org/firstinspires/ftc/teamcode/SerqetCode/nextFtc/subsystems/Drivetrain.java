@@ -17,7 +17,7 @@ public class Drivetrain implements Subsystem {
     private final MotorEx frontRight = new MotorEx("front_right").reversed();
     private final MotorEx backLeft = new MotorEx("back_left");
     private final MotorEx backRight = new MotorEx("back_right").reversed();
-
+    private double dtScale = 0.6;
     DriverControlledCommand driverControlled = new MecanumDriverControlled(
                 frontLeft,
                 frontRight,
@@ -31,17 +31,12 @@ public class Drivetrain implements Subsystem {
 
     @Override
     public void periodic(){
-
         // Unsure if this is good practice or not, but it's at least error free
         // as an attempt and simpler than creating a new driveControlled in teleop
         // based on trigger input
         // TODO - test TURBO button based in subsystem
-        if(gamepad1.left_trigger > 0.5) {
-            driverControlled.setScalar(((gamepad1.left_trigger + 1 ) * 0.5));
-        }
-        else{
-            driverControlled.setScalar(.6);
-        }
+        dtScale = 0.6 + (gamepad1.left_trigger * 0.4);   // creates speed additive based on trigger value
+        driverControlled.setScalar(dtScale);             // passes to controller.......maybe
     }
 
 }

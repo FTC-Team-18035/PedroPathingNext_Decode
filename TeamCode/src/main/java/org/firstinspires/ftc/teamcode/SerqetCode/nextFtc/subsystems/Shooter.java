@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
+
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.core.commands.Command;
@@ -16,10 +19,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 public class Shooter implements Subsystem {
 
     public static final Shooter INSTANCE = new Shooter();
-    public static double targetDistance = 0;
+    // public static double targetDistance = 0;
     private Shooter() { }
-
-    public static int MAGIC_NUMBER = 32;
 
     // Declare servos and motors
     private final ServoEx servoVertical = new ServoEx("shooter_vertical");
@@ -31,7 +32,7 @@ public class Shooter implements Subsystem {
     // PID for the shooter motors
     // TODO - program servos
     // TODO - verify motor directions
-    // TODO - tune PID values
+    // TODO - tune PID values  - change to public static to view on panels
     private ControlSystem controller = ControlSystem.builder()
             .velPid(0.0001, 0, 0.001)
             .basicFF(0.001,0,0)
@@ -44,7 +45,7 @@ public class Shooter implements Subsystem {
                 .and(new RunToVelocity(controller, launchVelocity).requires(this));
     }
     // command to spin up shooter motors
-    public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.1);  // initial spin up command (with delay) that may not be neede
+    public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.05);  // initial spin up command (with delay) that may not be neede
     // command to stop
     public Command stop = new RunToVelocity(controller, 0).requires(this);  // stop shooter motors by setting controller goal to 0
 
