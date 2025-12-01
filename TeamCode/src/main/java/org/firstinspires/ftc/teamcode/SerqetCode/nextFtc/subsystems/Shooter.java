@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
-
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.core.commands.Command;
@@ -13,25 +10,32 @@ import dev.nextftc.hardware.controllable.RunToVelocity;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
-import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 
 @Configurable
 public class Shooter implements Subsystem {
 
-    public static final Shooter INSTANCE = new Shooter();
-    // public static double targetDistance = 0;
-    private Shooter() { }
+    /* This creates a public class that allows any opmode access to our SHOOTER system
+       All functions of this subsystem are controlled by this one class of code and can be referenced by both auto and tele modes
+       through the calling of the predefined Commands below.  Any actions or adjustments to the operation of the INTAKE should take
+       place within this single class
+    */
+
+    public static final Shooter INSTANCE = new Shooter();       // public INSTANCE of this class to give access
+
+    private Shooter() { }                                       // private object of this class
 
     // Declare servos and motors
     private final ServoEx servoVertical = new ServoEx("shooter_vertical");
     private final ServoEx servoHorizontal = new ServoEx("shooter_horizontal");
+
+
+    // TODO - verify motor directions
     private MotorGroup shooterGroup = new MotorGroup(
             new MotorEx("left_shooter").reversed(),
             new MotorEx("right_shooter"));
 
-    // PID for the shooter motors
+    // PID for the SHOOTER motors
     // TODO - program servos
-    // TODO - verify motor directions
     // TODO - tune PID values  - change to public static to view on panels
     private ControlSystem controller = ControlSystem.builder()
             .velPid(0.0001, 0, 0.001)
@@ -39,16 +43,30 @@ public class Shooter implements Subsystem {
             .build();
 
     // command to call when aiming and shooting action is attempted
-    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {                   // feed calculated values into motor control and servos
-        return new SetPosition(servoHorizontal,aimAngle).requires(servoHorizontal)          // servo angle adjustment
-                .and(new SetPosition(servoVertical, launchAngle).requires(servoVertical))   // may need a delay here ???
+    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
+        return new SetPosition(servoHorizontal,aimAngle).requires(servoHorizontal)                  // servo angle adjustment
+                .and(new SetPosition(servoVertical, launchAngle).requires(servoVertical))           // may need a delay here ???
                 .and(new RunToVelocity(controller, launchVelocity).requires(this));
     }
+
+    // TODO - command to reset servos to a default angle of "0" horizontal and "??" vertical or incorporate into "stop"
+
     // command to spin up shooter motors
-    public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.05);  // initial spin up command (with delay) that may not be neede
+    public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.05);  // initial spin up command (with delay) that may not be needed
+
     // command to stop
     public Command stop = new RunToVelocity(controller, 0).requires(this);  // stop shooter motors by setting controller goal to 0
 
+
+    // this is where actions of this subsystem can be automatically run upon pushing the INIT button
+    @Override
+    public void initialize(){
+
+    }
+
+    // this is where actions of this subsystem are automatically called during the loop() of the NextFTC opmodes
+    // since this class uses a motor control system and commands only define that systems settings, we have to
+    // make the system set the motors power during each loop cycle to have an effect on the motor
     @Override
     public void periodic(){
         shooterGroup.setPower(controller.calculate(shooterGroup.getState()));    // update the controller calculations with each loop iteration
