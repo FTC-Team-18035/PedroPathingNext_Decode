@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+
+//TODO Set the weight, Update the deadwheel offsets, Check deadwheel directions
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(5); // Weight in Kilograms
