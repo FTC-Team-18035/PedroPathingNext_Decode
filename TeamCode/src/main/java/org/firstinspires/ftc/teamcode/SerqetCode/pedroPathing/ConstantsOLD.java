@@ -13,7 +13,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class Constants {
+public class ConstantsOLD {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(16.60148)
