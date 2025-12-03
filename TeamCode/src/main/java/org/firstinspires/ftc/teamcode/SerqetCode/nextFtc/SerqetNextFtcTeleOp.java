@@ -34,6 +34,7 @@ import static dev.nextftc.bindings.Bindings.*;
 
     left_trigger is variable TurboMode
     right_bumper is INTAKE
+    left_bumper is REVERSE INTAKE
     a is SHOOT
 */
 
@@ -124,6 +125,11 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
                     .and(Vault.INSTANCE.intake))               // activate INTAKE and VAULT for getting artifacts
                 .whenFalse(Intake.INSTANCE.stop
                     .and(Vault.INSTANCE.stop));                // de-activate INTAKE and VAULT
+
+        // TODO - determine if we need to move the vault while ejecting
+        button(() -> gamepad1.left_bumper)
+                .whenTrue(Intake.INSTANCE.eject)
+                .whenFalse(Intake.INSTANCE.stop);
     }
 
 
