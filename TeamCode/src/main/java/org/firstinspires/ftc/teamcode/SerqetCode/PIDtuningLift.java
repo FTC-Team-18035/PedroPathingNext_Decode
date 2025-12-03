@@ -26,7 +26,7 @@ public class PIDtuningLift extends OpMode {
 
     public static int liftTarget = 0;
 
-    private final double lift_ticks_in_degrees = 1.068055;
+    private final double lift_ticks_in_degrees = 1.068055;   // TODO - set for specific motor
 
     private DcMotorEx Lift;
 

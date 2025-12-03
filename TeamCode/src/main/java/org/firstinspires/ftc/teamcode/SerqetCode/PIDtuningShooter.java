@@ -25,7 +25,7 @@ public class PIDtuningShooter extends OpMode {
     public static double shooterTarget = 0;
     public static double shooterVel = 0;
     public static double shooterPower = 0;
-    private final double shooter_ticks_in_degrees = 0;
+    private final double shooter_ticks_in_degrees = 0;   // TODO - set this for specific motors
 
     private DcMotorEx leftShooter;
     private DcMotorEx rightShooter;
