@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing;
 
-import static org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Tuning.changes;
-import static org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Tuning.draw;
-import static org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Tuning.drawOnlyCurrent;
-import static org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Tuning.follower;
-import static org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Tuning.stopRobot;
-import static org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Tuning.telemetryM;
+import static org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Tuning.changes;
+import static org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Tuning.draw;
+import static org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Tuning.drawOnlyCurrent;
+import static org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Tuning.follower;
+import static org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Tuning.stopRobot;
+import static org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Tuning.telemetryM;
 
 import com.bylazar.configurables.PanelsConfigurables;
 import com.bylazar.configurables.annotations.Configurable;
@@ -29,6 +29,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ import java.util.List;
  * @author Baron Henderson - 20077 The Indubitables
  * @version 1.0, 6/26/2025
  */
-@Disabled
+
 @Configurable
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
 public class Tuning extends SelectableOpMode {
