@@ -2,22 +2,28 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import static dev.nextftc.bindings.Bindings.button;
 
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems.CRservoSubsytemTest;
+import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Vault;
 
 import java.util.List;
 
 import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
@@ -32,17 +38,24 @@ import dev.nextftc.hardware.impl.MotorEx;
 /*  Current MAIN teleop status:
 
     Drivetrain is active inside MAIN and should be moved to a Subsystem
-    Robotcentric is current contol mode
+    Robotcentric is current control mode
 
     INTAKE is active
     VAULT is active
     SHOOTER is active
+    LIFT is active
 
-    Control layout (all are gamepad1)  TODO - test and get driver feedback for layout
+    Control layout  TODO - test and get driver feedback for layout
 
+    GAMEPAD1
     left_trigger is variable TurboMode
     right_bumper is INTAKE
     a is SHOOT
+
+    GAMEPAD2
+    a is start limelight
+    b is stop limelight
+    x is reset position
 */
 
 
@@ -51,42 +64,57 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
     public SerqetNextFtcTeleOpLimelight() {
         addComponents(
-             new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
-             new SubsystemComponent(Intake.INSTANCE),    // enable INTAKE system
-             //new SubsystemComponent(VaultSubsystem.INSTANCE),    // enable VAULT system
-             new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
-             new SubsystemComponent(CRservoSubsytemTest.INSTANCE),
+                new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
+                new SubsystemComponent(Intake.INSTANCE),    // enable INTAKE system
+                new SubsystemComponent(Vault.INSTANCE),    // enable VAULT system
+                new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
+                // new SubsystemComponent(CRservoSubsytemTest.INSTANCE),  // testing purposes only
 
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );
     }
+
     private String telemetryValue = null;
 
     // Names for DECODE season robot SERQET
-    // CHASSIS motor directions verified 11/25/25
+
     private Limelight3A limelight;
+    private GoBildaPinpointDriver pinpoint;
+    // CHASSIS motor directions verified 11/25/25
     private final MotorEx frontLeft = new MotorEx("front_left");
     private final MotorEx frontRight = new MotorEx("front_right").reversed();
     private final MotorEx backLeft = new MotorEx("back_left");
     private final MotorEx backRight = new MotorEx("back_right").reversed();
-    private IMUEx pinpoint = new IMUEx("pinpoint", Direction.UP, Direction.FORWARD).zeroed();    // needed for Pedro field centric
-    public double dtScale = 0.6; // Drivetrain scalar variable to set default to half+ power
+    public double dtScalar = 0.6; // Drivetrain scalar variable to set default to half+ power
     public int aprilTag;
+
+    public double llDistance = 0;
 
     // Actions to take when opmode is INITIALIZED
     @Override
-    public void onInit()  {                     // set LIFT to hold the hold the lift
+    public void onInit() {                     // set LIFT to hold the hold the lift
+        // Configure the sensor
+        configurePinpoint();
+
+        // Set the location of the robot - TODO this should be the place you are starting the robot from and should pass from auto via BLACKBOARD
+        pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+
+        // initalize limelight
+        llInitialize();
+
+        /*  Deprecated and function moved to subsystem level
         final Command holdClear = Lift.INSTANCE.holdClear;
         holdClear.schedule();
-        llInitialize();
+        */
+
     }
 
     // Actions to take/ button bindings when START is pressed
     @Override
     public void onStartButtonPressed() {
         telemetry.addData("", telemetryValue);
-        // enable CHASSIS
+        // enable DRIVETRAIN
         DriverControlledCommand driverControlled = new MecanumDriverControlled(
                 frontLeft,
                 frontRight,
@@ -97,31 +125,25 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
                 Gamepads.gamepad1().rightStickX()
                 // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
         );
-        driverControlled.setScalar(dtScale);
+        driverControlled.setScalar(dtScalar);
         driverControlled.schedule();
 
         // TODO - test TURBO button feature moved to onUpdate()
-        // Bind TurboMode to left trigger
-        // this is trickier since the trigger(supplier) isn't a boolean
-        /* FEATURE MOVED TO onUpdate()
-        Variable<Float> left_trigger = variable(() -> gamepad1.left_trigger);
-        Button turboButton = left_trigger.asButton(value -> value > 0.5); // true when left trigger is positive.
-        turboButton                                                       // TURBO mode but it's variable
-                .whenTrue(() -> dtScale = 1)//(gamepad1.left_trigger))    // Lambda command to set trigger value to be the drivetrain scalar value
-                  .and(driverControlled.setScalar(dtScale))               // issue update scalar command
 
-                .whenBecomesFalse(() -> dtScale = 0.5)                    // default to half power
-                   .and(driverControlled.setScalar(dtScale));             // issue update scalar command
-        */
+        // Bind shooting actions to gamepad1.a
+        button(() -> gamepad1.a)
+                .whenBecomesTrue(Shooter.INSTANCE.spinup)
+                .whenTrue(() -> {
+                    double[] trajPair = Trajectory.Calculate(llDistance /* in mm */);
+                    new Delay(0.1);                                                 //
+                    Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)
+                            .and(Vault.INSTANCE.outtake); })
 
-        // Bind shooting actions to gampad1.a
-        button(() -> gamepad1.left_bumper)
-                .whenTrue(Shooter.INSTANCE.spinup)               // may not be helpful - a delay in shoot command (Subsystem level) may be best
-                .whenTrue(Shooter.INSTANCE.shoot(5,.1, 0))
-                        //.and(VaultSubsystem.INSTANCE.outtake))
                 // TODO - how to trigger Limelight read/Trajectory calculation and pass
-                // TODO - Have PinPoint hold position Pedro?
-                //.whenBecomesFalse(VaultSubsystem.INSTANCE.stop)
+                // TODO - Have PinPoint hold position
+                // possibly get position-switch to Pedro controlled to maintain-when shooting is finished then
+                // switch to driverControlled
+                .whenBecomesFalse(Vault.INSTANCE.stop.and(Shooter.INSTANCE.stop))
                 .whenFalse(Shooter.INSTANCE.stop);
 
         // Bind LIFT activation to button
@@ -130,56 +152,38 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
 
         // Bind INTAKE actions to button
         button(() -> gamepad1.right_bumper)
-                .whenTrue(Intake.INSTANCE.run
-                                .and(CRservoSubsytemTest.INSTANCE.go))
-                    //.and(VaultSubsystem.INSTANCE.intake))           // activate INTAKE and VAULT for getting artifacts
-                .whenFalse(Intake.INSTANCE.stop
-                                .and(CRservoSubsytemTest.INSTANCE.stop));
-                                //.and(VaultSubsystem.INSTANCE.stop));                // de-activate INTAKE and VAULT
+                .whenTrue(Intake.INSTANCE.run.and(CRservoSubsytemTest.INSTANCE.go))
+                //.and(Vault.INSTANCE.intake))           // activate INTAKE and VAULT for getting artifacts
+                .whenFalse(Intake.INSTANCE.stop.and(CRservoSubsytemTest.INSTANCE.stop));
+        //.and(Vault.INSTANCE.stop));                // de-activate INTAKE and VAULT
+
     }
-
-
 
     @Override
     public void onUpdate() {            // code to run during loop()
-        // in loop(), or in NextFTC, onUpdate():
+
         BindingManager.update();        // this is what checks for the gamepad input during loop
-        // Attempt TURBO in this section
-        if(gamepad1.left_trigger > 0.25) {
-            DriverControlledCommand driverControlled = new MecanumDriverControlled(
-                    frontLeft,
-                    frontRight,
-                    backLeft,
-                    backRight,
-                    Gamepads.gamepad1().leftStickY().negate(),
-                    Gamepads.gamepad1().leftStickX(),
-                    Gamepads.gamepad1().rightStickX()
-                    // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
-            );
-            driverControlled.setScalar(1);
-            driverControlled.schedule();
+
+        if (gamepad2.x) {
+            // You could use readings from April Tags here to give a new known position to the pinpoint
+            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
         }
-        else {
-            DriverControlledCommand driverControlled = new MecanumDriverControlled(
-                frontLeft,
-                frontRight,
-                backLeft,
-                backRight,
-                Gamepads.gamepad1().leftStickY().negate(),
-                Gamepads.gamepad1().leftStickX(),
-                Gamepads.gamepad1().rightStickX()
-                // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
-            );
-            driverControlled.setScalar(0.6);
-            driverControlled.schedule();
+        pinpoint.update();                      // calls for the IMU update of data each loop
+        Pose2D pose2D = pinpoint.getPosition();
+
+        if (gamepad2.a) {                        // gamepad 2 starts/stops limelight in this test opMode
+            limelight.start();
+            llScan();
         }
 
+        if (gamepad2.b) {
+            limelight.pause();
+        }
 
     }
 
     @Override
-    public void onStop(){               // code to run once on stop()
-        // in stop(), or in NextFTC, onStop():
+    public void onStop() {               // code to run once on stop()
         BindingManager.reset();         // this is just housekeeping at the end of teleOp
     }
 
@@ -194,7 +198,7 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
 
-     }
+    }
 
     private int llScan() {
         LLStatus status = limelight.getStatus();
@@ -205,21 +209,25 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
         telemetry.addData("Pipeline", "Index: %d, Type: %s",
                 status.getPipelineIndex(), status.getPipelineType());
 
-        LLResult result = limelight.getLatestResult();
-        if (result.isValid()) {
-            // Access general information
-            Pose3D botpose = result.getBotpose();
-
-            telemetry.addData("Botpose", botpose.toString());
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+            Pose3D botPose = llResult.getBotpose_MT2();
+            limelight.updateRobotOrientation(pinpoint.getHeading(AngleUnit.DEGREES));
+            llDistance = getDistance(llResult.getTa());
+            telemetry.addData("Calculated Distance", llDistance);
+            telemetry.addData("Target X", llResult.getTx());
+            telemetry.addData("Target Area", llResult.getTa());
+            telemetry.addData("Botpose", botPose.toString());
 
             // Access fiducial results
-            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            List<LLResultTypes.FiducialResult> fiducialResults = llResult.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
                 aprilTag = fr.getFiducialId();
                 // telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
             }
-
-        } else {
+        }
+        else {
+            llDistance=5;
             telemetry.addData("Limelight", "No data available");
         }
 
@@ -227,7 +235,52 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
 
         return aprilTag;
     }
-    // private void pinpoint() {
-    //
-    // }
+    public double getDistance(double ta ){
+        double scale = 30000.00 ;   // TODO - measure to get scale
+        double llDistance = ( scale/ ta );
+        return llDistance;
+    }
+
+    /*
+      Here is the configuration value settings for the pinpoint IMU
+    */
+    private void configurePinpoint () {
+            /*
+             *  Set the odometry pod positions relative to the point that you want the position to be measured from.
+             *
+             *  The X pod offset refers to how far sideways from the tracking point the X (forward) odometry pod is.
+             *  Left of the center is a positive number, right of center is a negative number.
+             *
+             *  The Y pod offset refers to how far forwards from the tracking point the Y (strafe) odometry pod is.
+             *  Forward of center is a positive number, backwards is a negative number.
+             */
+            pinpoint.setOffsets(-0, -41.2, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+            // Eli provided 11-30
+            /*
+             * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
+             * the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
+             * If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
+             * number of ticks per unit of your odometry pod.  For example:
+             *     pinpoint.setEncoderResolution(13.26291192, DistanceUnit.MM);
+             */
+            pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+            /*
+             * Set the direction that each of the two odometry pods count. The X (forward) pod should
+             * increase when you move the robot forward. And the Y (strafe) pod should increase when
+             * you move the robot to the left.
+             */
+            pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,   // TODO - check directions
+                    GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+            /*
+             * Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
+             * The IMU will automatically calibrate when first powered on, but recalibrating before running
+             * the robot is a good idea to ensure that the calibration is "good".
+             * resetPosAndIMU will reset the position to 0,0,0 and also recalibrate the IMU.
+             * This is recommended before you run your autonomous, as a bad initial calibration can cause
+             * an incorrect starting value for x, y, and heading.
+             */
+            pinpoint.resetPosAndIMU();
+    }
 }
