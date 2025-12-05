@@ -28,15 +28,15 @@ public class Shooter implements Subsystem {
     private final ServoEx servoVertical = new ServoEx("shooter_vertical");
     private final ServoEx servoHorizontal = new ServoEx("shooter_horizontal");
 
-
+    // TODO - program servos to mirrored and work in unison
+            // TODO - program as servogroup with feedback
     // TODO - verify motor directions
     private MotorGroup shooterGroup = new MotorGroup(
             new MotorEx("left_shooter").reversed(),
             new MotorEx("right_shooter"));
 
     // PID for the SHOOTER motors
-    // TODO - program servos
-    // TODO - tune PID values  - change to public static to view on panels
+
     private ControlSystem controller = ControlSystem.builder()
             .velPid(0.0001, 0, 0.001)
             .basicFF(0.001,0,0)
@@ -44,7 +44,7 @@ public class Shooter implements Subsystem {
 
     // command to call when aiming and shooting action is attempted
     public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
-        return new SetPosition(servoHorizontal,aimAngle).requires(servoHorizontal)                  // servo angle adjustment
+        return new SetPosition(servoHorizontal,launchAngle).requires(servoHorizontal)                  // servo angle adjustment
                 .and(new SetPosition(servoVertical, launchAngle).requires(servoVertical))           // may need a delay here ???
                 .and(new RunToVelocity(controller, launchVelocity).requires(this));
     }
@@ -52,7 +52,7 @@ public class Shooter implements Subsystem {
     // TODO - command to reset servos to a default angle of "0" horizontal and "??" vertical or incorporate into "stop"
 
     // command to spin up shooter motors
-    public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.05);  // initial spin up command (with delay) that may not be needed
+    public Command spinup = new RunToVelocity(controller,.15).requires(this);  // initial spin up command (with delay) that may not be needed
 
     // command to stop
     public Command stop = new RunToVelocity(controller, 0).requires(this);  // stop shooter motors by setting controller goal to 0
