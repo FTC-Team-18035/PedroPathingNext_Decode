@@ -35,6 +35,8 @@ public class Vault implements Subsystem {
 
     public Command stop = new SetPower(vaultFeed, 0).requires(this);
 
+    public Command eject = new SetPower(vaultFeed, 1).requires(this);
+
     public Command open = new SetPosition(vaultRelease, 0).requires(this);
 
     public Command close = new SetPosition(vaultRelease, 1).requires(this);

@@ -41,6 +41,7 @@ public class SerqetMAIN extends NextFTCOpMode {
 
     left_trigger is TurboMode
     right_bumper is INTAKE
+    left_bumper is REVERSE INTAKE
     a is SHOOT
     dpad up is LIFT
 */
@@ -75,8 +76,8 @@ public class SerqetMAIN extends NextFTCOpMode {
         public void onInit() {
             // set LIFT to hold the hold the lift
             // TODO - this function has not been verified although motor direction has
-            final Command holdClear = Lift.INSTANCE.holdClear;
-            holdClear.schedule();
+            //final Command holdClear = Lift.INSTANCE.holdClear;
+            //holdClear.schedule();
         }
 
         // Actions to take/ button bindings when START is pressed
@@ -121,6 +122,13 @@ public class SerqetMAIN extends NextFTCOpMode {
                             .and(Vault.INSTANCE.intake))               // activate INTAKE and VAULT for getting artifacts
                     .whenFalse(Intake.INSTANCE.stop
                             .and(Vault.INSTANCE.stop));                // de-activate INTAKE and VAULT
+
+            // TODO - determine if we need to move the vault while ejecting
+            button(() -> gamepad1.left_bumper)
+                    .whenTrue(Intake.INSTANCE.eject
+                            .and(Vault.INSTANCE.eject))
+                    .whenFalse(Intake.INSTANCE.stop
+                            .and(Vault.INSTANCE.stop));
         }
 
 

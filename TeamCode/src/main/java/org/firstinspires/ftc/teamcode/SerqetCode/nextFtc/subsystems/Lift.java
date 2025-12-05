@@ -40,8 +40,8 @@ public class Lift implements Subsystem {
     public void initialize() {
 
         // TODO - test if this actually holds the LIFT system up at the start and during teleop movement
-        new RunToPosition(controlSystem, 0);                   // set the control system to have a goal of 0
-        motor.setPower(controlSystem.calculate(motor.getState()));  // and maintain ground clearance for teleop movement
+        //new RunToPosition(controlSystem, 0);                   // set the control system to have a goal of 0
+        //motor.setPower(controlSystem.calculate(motor.getState()));  // and maintain ground clearance for teleop movement
 
     }
 

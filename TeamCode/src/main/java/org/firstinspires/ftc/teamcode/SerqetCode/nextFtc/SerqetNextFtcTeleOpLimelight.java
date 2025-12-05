@@ -145,37 +145,8 @@ public class SerqetNextFtcTeleOpLimelight extends NextFTCOpMode {
         // in loop(), or in NextFTC, onUpdate():
         BindingManager.update();        // this is what checks for the gamepad input during loop
         // Attempt TURBO in this section
-        if(gamepad1.left_trigger > 0.25) {
-            DriverControlledCommand driverControlled = new MecanumDriverControlled(
-                    frontLeft,
-                    frontRight,
-                    backLeft,
-                    backRight,
-                    Gamepads.gamepad1().leftStickY().negate(),
-                    Gamepads.gamepad1().leftStickX(),
-                    Gamepads.gamepad1().rightStickX()
-                    // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
-            );
-            driverControlled.setScalar(1);
-            driverControlled.schedule();
-        }
-        else {
-            DriverControlledCommand driverControlled = new MecanumDriverControlled(
-                frontLeft,
-                frontRight,
-                backLeft,
-                backRight,
-                Gamepads.gamepad1().leftStickY().negate(),
-                Gamepads.gamepad1().leftStickX(),
-                Gamepads.gamepad1().rightStickX()
-                // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
-            );
-            driverControlled.setScalar(0.6);
-            driverControlled.schedule();
-        }
 
-
-    }
+        }
 
     @Override
     public void onStop(){               // code to run once on stop()
