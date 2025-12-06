@@ -9,9 +9,11 @@ public class Trajectory {
         double m = Math.min(-1.5, (-200.0 - y0) / distance); // The SLOPE with which an artifact will enter the goal with. NOT AN ANGLE
         double a = -(y0 / Math.pow(distance, 2)) + (m / distance); // The "a" value in the parabola equation
         double b = ((2.0 * y0) / distance) - m; // The "b" value in the parabola equation
-        double launchAngle = Math.atan(b); // The launch angle in radians
-        double launchVelocity = (1.0 / Math.cos(launchAngle)) * Math.sqrt(g / (2.0 * a)); //The launch velocity in cm/s
-        return new double[] { launchVelocity, launchAngle };
+        double rawlaunchAngle = Math.atan(b); // The launch angle in radians
+        double launchVelocity = (1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)); //The launch velocity in cm/s
+        double launchAngle = rawlaunchAngle; // TODO - math to reduce full angle to just and additive angle for the servos
+                                             // TODO - min/max filtering to remain within hardware limits ?
+        return new double[] { launchVelocity, launchAngle }; // these are the target for the shooter's flywheel and servo angle adjustments
     }
 }
 
