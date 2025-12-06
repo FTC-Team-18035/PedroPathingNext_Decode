@@ -24,6 +24,7 @@ public class Shooter implements Subsystem {
 
     public static final Shooter INSTANCE = new Shooter();       // public INSTANCE of this class to give access
 
+    public double servoAngle;
     private Shooter() { }                                       // private object of this class
 
     // Declare servos and motors
@@ -46,25 +47,25 @@ public class Shooter implements Subsystem {
     // PID for the SHOOTER motors
 
     private ControlSystem controller = ControlSystem.builder()
-            .velPid(0.0001, 0, 0)
-            .basicFF(0.001,0,0)
+            .velPid(0.008, 0, 0)
+            .basicFF(0.00055,0,0)
             .build();
 
     // command to call when aiming and shooting action is attempted
     public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
-        return new SetPosition(servoHorizontal,launchAngle).requires(servoHorizontal)                  // servo angle adjustment
-                .and(new SetPosition(servoVertical, launchAngle).requires(servoVertical))           // may need a delay here ???
+        return new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)                  // servo angle adjustment // TODO FUTURE make the shooter servos into a group to make sure that they run at the same time
+                .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))           // may need a delay here ???
                 .and(new RunToVelocity(controller, launchVelocity).requires(this));
     }
 
 
     // command to spin up shooter motors - probably will be DEPRECATED when motor tuning is completed
-    public Command spinup = new RunToVelocity(controller,.15).requires(this);  // initial spin up command (with delay) that may not be needed
+    public Command spinup = new RunToVelocity(controller,200).requires(this);  // initial spin up command (with delay) that may not be needed
 
     // command to stop
     public Command stop = new RunToVelocity(controller, 0).requires(this)  // stop flywheels
-            .and(new SetPosition(servoHorizontal,0).requires(this)      // reset to default angle
-            .and(new SetPosition(servoVertical,0).requires(this))) ;    // reset to default angle
+            .and(new SetPosition(servoHorizontal,.1809).requires(this)      // reset to min angle
+            .and(new SetPosition(servoVertical,.1809).requires(this))) ;    // reset to min angle
 
 
     // this is where actions of this subsystem can be automatically run upon pushing the INIT button
@@ -79,6 +80,19 @@ public class Shooter implements Subsystem {
     @Override
     public void periodic(){
         shooterGroup.setPower(controller.calculate(shooterGroup.getState()));    // update the controller calculations with each loop iteration
+
+
+    }
+
+    public double checkIfSafe(double servoAngle) {
+        double newAngle = servoAngle;
+        if (servoAngle >= .2306) {
+            newAngle = .2306;
+        }
+        if (servoAngle <= .1809) {
+            newAngle = .1809;
+        }
+        return newAngle;
     }
 
 }

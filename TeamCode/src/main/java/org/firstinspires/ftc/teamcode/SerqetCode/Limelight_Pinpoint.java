@@ -16,15 +16,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 public class Limelight_Pinpoint extends OpMode {
     private Limelight3A limelight;
 
-    GoBildaPinpointDriver pinpoint;
+    public GoBildaPinpointDriver pinpoint;
     private double llDistance;
 
     @Override
     public void init() {
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        // Configure the sensor
-        configurePinpoint();
+
         // Set the location of the robot - this should be the place you are starting the robot from
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
@@ -34,6 +33,8 @@ public class Limelight_Pinpoint extends OpMode {
 
     @Override
     public void start() {
+        // Configure the sensor
+        configurePinpoint();
         limelight.start();
 
     }
@@ -54,6 +55,12 @@ public class Limelight_Pinpoint extends OpMode {
                 telemetry.addData("Target Area", llResult.getTa());
                 telemetry.addData("Botpose", botPose.toString());
             }
+
+            telemetry.addData("pinpoint x", pinpoint.getPosition().getX(DistanceUnit.MM));
+            telemetry.addData("pinpoint y", pinpoint.getPosition().getY(DistanceUnit.MM));
+            telemetry.addData("pinpoint heading", pinpoint.getPosition().getHeading(AngleUnit.DEGREES));
+
+            telemetry.update();
         }
 
         public double getDistance(double ta ){
