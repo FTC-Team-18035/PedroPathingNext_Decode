@@ -41,8 +41,8 @@ public class Shooter implements Subsystem {
     // TODO - program servos to be mirrored and work in unison
     // TODO - verify motor directions
     private MotorGroup shooterGroup = new MotorGroup(
-            new MotorEx("left_shooter").reversed(),
-            new MotorEx("right_shooter"));
+            new MotorEx("left_shooter"),
+            new MotorEx("right_shooter").reversed());
 
     // PID for the SHOOTER motors
 
@@ -60,7 +60,7 @@ public class Shooter implements Subsystem {
 
 
     // command to spin up shooter motors - probably will be DEPRECATED when motor tuning is completed
-    public Command spinup = new RunToVelocity(controller,200).requires(this);  // initial spin up command (with delay) that may not be needed
+    public Command spinup = new RunToVelocity(controller,1).requires(this);  // initial spin up command (with delay) that may not be needed
 
     // command to stop
     public Command stop = new RunToVelocity(controller, 0).requires(this)  // stop flywheels

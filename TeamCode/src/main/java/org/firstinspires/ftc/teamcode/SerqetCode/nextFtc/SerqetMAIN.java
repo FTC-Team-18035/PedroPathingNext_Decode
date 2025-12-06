@@ -102,7 +102,7 @@ public class SerqetMAIN extends NextFTCOpMode {
 
             // Bind shooting actions to gamepad1.a
             button(() -> gamepad1.a)
-                    .whenBecomesTrue(Shooter.INSTANCE.spinup)             // may not be helpful - a delay in shoot command (Subsystem level) may be best
+                    //.whenBecomesTrue(Shooter.INSTANCE.spinup)             // may not be helpful - a delay in shoot command (Subsystem level) may be best
                     .whenTrue(
                         () -> {double[] trajPair = Trajectory.Calculate(210);  // Testing in TestMAIN on 12/6
                         Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)
@@ -134,11 +134,12 @@ public class SerqetMAIN extends NextFTCOpMode {
 
         @Override
         public void onUpdate() {            // code to run during loop()
+            double[] trajPairTelemetry = Trajectory.Calculate(500);
+            telemetry.addData("trajectory feedback", trajPairTelemetry[0]);
+            telemetry.addData("angle feedback", trajPairTelemetry[1]);
+            telemetry.update();
 
             BindingManager.update();                // this is what checks for the gamepad input during loop
-            if (gamepad2.a) {
-
-            }
             if (gamepad1.left_trigger > 0.1) {      // TURBO button via brute force
                 dtScalar = 1;
             }

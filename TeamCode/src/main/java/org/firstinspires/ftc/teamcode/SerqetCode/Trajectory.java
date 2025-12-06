@@ -11,7 +11,7 @@ public class Trajectory {
         double b = ((2.0 * y0) / distance) - m; // The "b" value in the parabola equation
         double rawlaunchAngle = Math.atan(b); // The launch angle in radians
         //Degraded (hopefully) double launchVelocity = (1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a));
-        double launchVelocity = ((1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)))*12.21730476; //The launch velocity in cm/s
+        double launchVelocity = ((1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)))* 1.23787177960363;  //12.21730476; //The launch velocity in cm/s
 
         double launchAngle = Math.toDegrees(rawlaunchAngle) * .00392157;
                                              // TODO - min/max filtering to remain within hardware limits ?
