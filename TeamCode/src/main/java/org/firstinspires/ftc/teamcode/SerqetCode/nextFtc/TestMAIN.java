@@ -68,7 +68,8 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class TestMAIN extends NextFTCOpMode {
     public TestMAIN() {
         addComponents(
-                new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
+                // new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
+                //  DEACTIVATED FOR 12-6 TESTING
                 new SubsystemComponent(Intake.INSTANCE),    // enable INTAKE system
                 new SubsystemComponent(Vault.INSTANCE),    // enable VAULT system
                 new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
@@ -90,7 +91,7 @@ public class TestMAIN extends NextFTCOpMode {
     private final MotorEx backRight = new MotorEx("back_right").reversed();
     public double dtScalar = 0.5; // Drivetrain scalar variable to set default to half power - could be calibrated to ANY VALUE upon testing
     public int aprilTag;
-    public double llDistance = 1;
+    public double llDistance = 100;  // default distance of shooter in cm ???
     private TelemetryManager panelsTelemetry;
 
     // Actions to take when opmode is INITIALIZED
@@ -125,23 +126,21 @@ public class TestMAIN extends NextFTCOpMode {
                 Gamepads.gamepad1().rightStickX().map((x) -> {return x * dtScalar;})
                 // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
         );
-        driverControlled.setScalar(dtScalar);
+
         driverControlled.schedule();
 
         // ****** GAMEPAD1 controls ******
 
         // Bind TURBO button to gamepad1.left_trigger  TODO - this button replaces the previous IF statement in onUpdate loop - 90% confidence on this implementation
         button(() -> gamepad1.left_trigger > 0.1 )      // TODO - if unsuccessful comment out and uncomment IF statement in onUpdate loop
-                .whenBecomesTrue(
-                        () -> {dtScalar = 1;                        // scale to full power
-                            driverControlled.setScalar(dtScalar);})
-                .whenBecomesFalse(                                  // default to half power
-                        () -> {dtScalar = 0.5;
-                            driverControlled.setScalar(dtScalar);});
+                .whenBecomesTrue(() -> {dtScalar = 1;})                        // scale to full power
+                           // driverControlled.setScalar(dtScalar);})  not needed  as it's mapped to the sticks
+                .whenBecomesFalse(() -> {dtScalar = 0.5;});                    // default to half power
+                           // driverControlled.setScalar(dtScalar);});   not needed as it's mapped to the sticks
 
         // Bind shooting actions to gamepad1.a
         button(() -> gamepad1.a)
-                .whenBecomesTrue(Shooter.INSTANCE.spinup)
+                // .whenBecomesTrue(Shooter.INSTANCE.spinup)  DEPRECATED UPON DISCUSSION WITH MECHANICAL
                 .whenTrue(() -> {
                     double[] trajPair = Trajectory.Calculate(llDistance /* in mm */);   // this is limelight informed trajectory method calculation call
                     new Delay(0.1);                                                // delay added to the sequence just for fun
@@ -154,9 +153,11 @@ public class TestMAIN extends NextFTCOpMode {
                 .whenBecomesFalse(Vault.INSTANCE.stop.and(Shooter.INSTANCE.stop))
                 .whenFalse(Shooter.INSTANCE.stop);
 
+        /*  DEACTIVATED FOR 12-6 testing
         // Bind LIFT activation to button
         button(() -> gamepad1.dpad_up)
                 .whenBecomesTrue(Lift.INSTANCE.toHigh);        // Parking action to raise lift
+        */
 
         // Bind INTAKE actions to button
         button(() -> gamepad1.right_bumper)
@@ -283,7 +284,7 @@ public class TestMAIN extends NextFTCOpMode {
          *  The Y pod offset refers to how far forwards from the tracking point the Y (strafe) odometry pod is.
          *  Forward of center is a positive number, backwards is a negative number.
          */
-        pinpoint.setOffsets(-0, -41.2, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+        pinpoint.setOffsets(-94.9706, -70.70786, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
         // TODO - Eli provided 11-30 but no feature testing as of 12-3
         /*
          * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -299,7 +300,7 @@ public class TestMAIN extends NextFTCOpMode {
          * increase when you move the robot forward. And the Y (strafe) pod should increase when
          * you move the robot to the left.
          */
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,   // TODO - check directions
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,   // TODO - verify directions
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         /*

@@ -28,7 +28,7 @@ public class Shooter implements Subsystem {
     private final ServoEx servoVertical = new ServoEx("shooter_vertical");
     private final ServoEx servoHorizontal = new ServoEx("shooter_horizontal");
 
-    // TODO - program servos to mirrored and work in unison
+    // TODO - program servos to be mirrored and work in unison
             // TODO - program as servogroup with feedback
     // TODO - verify motor directions
     private MotorGroup shooterGroup = new MotorGroup(
@@ -38,7 +38,7 @@ public class Shooter implements Subsystem {
     // PID for the SHOOTER motors
 
     private ControlSystem controller = ControlSystem.builder()
-            .velPid(0.0001, 0, 0.001)
+            .velPid(0.0001, 0, 0)
             .basicFF(0.001,0,0)
             .build();
 
@@ -49,13 +49,14 @@ public class Shooter implements Subsystem {
                 .and(new RunToVelocity(controller, launchVelocity).requires(this));
     }
 
-    // TODO - command to reset servos to a default angle of "0" horizontal and "??" vertical or incorporate into "stop"
 
     // command to spin up shooter motors
     public Command spinup = new RunToVelocity(controller,.15).requires(this);  // initial spin up command (with delay) that may not be needed
 
     // command to stop
-    public Command stop = new RunToVelocity(controller, 0).requires(this);  // stop shooter motors by setting controller goal to 0
+    public Command stop = new RunToVelocity(controller, 0).requires(this)  // stop flywheels
+            .and(new SetPosition(servoHorizontal,0).requires(this)      // reset to default angle
+            .and(new SetPosition(servoVertical,0).requires(this))) ;    // reset to default angle
 
 
     // this is where actions of this subsystem can be automatically run upon pushing the INIT button
