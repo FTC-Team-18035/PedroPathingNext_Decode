@@ -43,7 +43,7 @@ import dev.nextftc.hardware.impl.MotorEx;
   *  INTAKE is active
   *  VAULT is active
   *  SHOOTER is active
-  *  LIFT is active
+  *  LIFT is deactivated        // TODO - create software or mechanical solution for lift stabilization until endgame
   *  LIMELIGHT is operating and in feature development  TODO - verify function and calibrate with Apriltag reading measurements
   *  PINPOINT is functioning IMU  TODO - verify pinpoint setup and accuracy
   *
@@ -56,10 +56,10 @@ import dev.nextftc.hardware.impl.MotorEx;
   *  dpad_up if activate LIFT
   *  a is SHOOT
   *
-  *  GAMEPAD2        TODO - make these features automatic when proven working
-  *  a is start limelight
-  *  b is stop limelight
-  *  x is reset pinpoint position
+  *  GAMEPAD2               TODO - make these features automatic in code when proven working
+  *  a is start limelight   // these should happen during autonomous for targeted INTAKE and SHOOTING and NAVIGATION by Apriltags
+  *  b is stop limelight    // and automatically after successful INTAKE/and scoring during teleop for power savings
+  *  x is reset pinpoint position // this should happen after successful limelight Apriltag localization to update robots global position
   */
 
 
@@ -147,7 +147,7 @@ public class TestMAIN extends NextFTCOpMode {
                     Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)        // this is calculated shooting minus any fine tuning for horizontal aim
                             .and(Vault.INSTANCE.outtake); })                            // TODO - test feature and develop fine tuning
 
-                // TODO - Have PinPoint hold position for actively stabilized shooting
+                // TODO - Have PinPoint help hold position for actively stabilized shooting
                 // possibly get position-switch to Pedro controlled to maintain-when shooting is finished then
                 // switch to driverControlled
                 .whenBecomesFalse(Vault.INSTANCE.stop.and(Shooter.INSTANCE.stop))
@@ -255,7 +255,7 @@ public class TestMAIN extends NextFTCOpMode {
             }
         }
         else {                          // TODO - determine the value and validity of this feature
-            llDistance=5;               // this could be a place holder value for a default shooting value if limelight readings are unavailable (ie another robot is in the way)
+            llDistance=100;             // this could be a place holder value for a default shooting value if limelight readings are unavailable (ie another robot is in the way)
             panelsTelemetry.addData("Limelight", "No data available");
         }
 

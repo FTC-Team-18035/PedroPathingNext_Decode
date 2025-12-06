@@ -18,7 +18,7 @@ public class Intake implements Subsystem {
 
         private MotorEx motor = new MotorEx("intake");    // this assigns our robot config motor named "intake" to this subsystem's control
 
-        // TODO - assign eject to a button in the teleop modes
+        // TODO - assign eject to a button in the teleop modes - TestMAIN 12/6 implemented for testing
 
         // this command is called by NextFTCOpModes to run the INTAKE @ negative power
         public Command eject = new SetPower(motor, -1).requires(this);

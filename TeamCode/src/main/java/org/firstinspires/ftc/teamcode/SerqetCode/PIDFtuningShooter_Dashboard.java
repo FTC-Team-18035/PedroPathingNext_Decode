@@ -22,7 +22,7 @@ public class PIDFtuningShooter_Dashboard extends OpMode {
     private PIDFController ShooterController;
     public static double sp = 0, si = 0, sd = 0, sf = 0;
     public static double shooterTarget = 0;
-    private final double shooter_ticks_in_degrees = 0;   // TODO - set this for specific motors
+    private final double shooter_ticks_in_degrees = 28;   // set this for specific motors completed 12/6
     private DcMotorEx leftShooter;
     private DcMotorEx rightShooter;
     public static TelemetryManager panelsTelemetry;

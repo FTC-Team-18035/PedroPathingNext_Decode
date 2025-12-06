@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
-//TODO Set the weight, Update the deadwheel offsets, Check deadwheel directions
+//TODO Set the weight, Check deadwheel directions
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(5); // Weight in Kilograms
@@ -32,8 +32,8 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5) // Needs updated
-            .strafePodX(0.5) // Needs updated
+            .forwardPodY(-70.70786) //  updated 12/6
+            .strafePodX(-94.9706) // updated 12/6
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

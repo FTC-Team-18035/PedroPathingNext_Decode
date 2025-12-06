@@ -21,9 +21,9 @@ public class Lift implements Subsystem {
 
     private MotorEx motor = new MotorEx("lift");  // get lift motor for private use of this class
 
-    // TODO - tune PID - may be able to make constructor public static??
+    // TODO - tune PID - using dedicated opmode for tuning transfer correct numbers
         private ControlSystem controlSystem = ControlSystem.builder()
-            .posPid(0.015, 0, 0.0002)
+            .posPid(0, 0, 0)
             .elevatorFF(0.04)
             .build();
 
@@ -31,7 +31,7 @@ public class Lift implements Subsystem {
     // this command is designed to run from the beginning of the opmodes and hold the LIFT baseplate up off the field
     public Command holdClear = new RunToPosition(controlSystem, 0).requires(this); // hold plate up for driving
 
-    // TODO - determine correct encoder value for full and safe climbing
+    // TODO - determine correct encoder value for full and safe climbing - 1200 is @ 1/3 mechanical limit
     // this command is the singular function of the LIFT system during endgame to climb high and allow parking under Serqet
     public Command toHigh = new RunToPosition(controlSystem, 1200).requires(this); // engage lift for parking
 
@@ -39,8 +39,8 @@ public class Lift implements Subsystem {
     @Override
     public void initialize() {
 
-        // TODO - test if this actually holds the LIFT system up at the start and during teleop movement
-        //new RunToPosition(controlSystem, 0);                   // set the control system to have a goal of 0
+        // TODO - decide if software via current sensing? or mechanical solution to hold base up until endgame
+        // new RunToPosition(controlSystem, 0);                   // set the control system to have a goal of 0
         //motor.setPower(controlSystem.calculate(motor.getState()));  // and maintain ground clearance for teleop movement
 
     }

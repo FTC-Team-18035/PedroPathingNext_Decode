@@ -104,7 +104,7 @@ public class SerqetMAIN extends NextFTCOpMode {
             button(() -> gamepad1.a)
                     .whenBecomesTrue(Shooter.INSTANCE.spinup)             // may not be helpful - a delay in shoot command (Subsystem level) may be best
                     .whenTrue(
-                        () -> {double[] trajPair = Trajectory.Calculate(1000);  // TODO - this will be limelight calculated distance
+                        () -> {double[] trajPair = Trajectory.Calculate(1000);  // Testing in TestMAIN on 12/6
                         Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)
                         .and(Vault.INSTANCE.outtake);})
 
@@ -154,7 +154,7 @@ public class SerqetMAIN extends NextFTCOpMode {
             BindingManager.reset();         // this is just housekeeping at the end of teleOp
         }
 
-        // TODO - add sensor methods here (pinpoint/Limelight)
+        // Testing in TestMAIN on 12/6
         // private void Limelight3A() {
         //
         // }

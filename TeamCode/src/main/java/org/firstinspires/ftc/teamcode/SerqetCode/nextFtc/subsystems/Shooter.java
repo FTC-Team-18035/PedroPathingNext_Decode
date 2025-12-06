@@ -7,8 +7,10 @@ import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.controllable.MotorGroup;
 import dev.nextftc.hardware.controllable.RunToVelocity;
+import dev.nextftc.hardware.impl.FeedbackServoEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
+import dev.nextftc.hardware.positionable.ServoGroup;
 import dev.nextftc.hardware.positionable.SetPosition;
 
 @Configurable
@@ -28,8 +30,14 @@ public class Shooter implements Subsystem {
     private final ServoEx servoVertical = new ServoEx("shooter_vertical");
     private final ServoEx servoHorizontal = new ServoEx("shooter_horizontal");
 
+
+    // TODO - FUTURE REFINEMENT: program as servogroup with feedback
+    // private final ServoGroup aimGroup = new ServoGroup(
+    //      new FeedbackServoEx("shooter_vertical" , 0 , 0.0 )      // unsure of this-need to research
+    //      new FeedbackServoEx("shooter_horizontal" , 0 , 0.0 ));  // FeedbackServoEx documentation
+
+
     // TODO - program servos to be mirrored and work in unison
-            // TODO - program as servogroup with feedback
     // TODO - verify motor directions
     private MotorGroup shooterGroup = new MotorGroup(
             new MotorEx("left_shooter").reversed(),
@@ -50,7 +58,7 @@ public class Shooter implements Subsystem {
     }
 
 
-    // command to spin up shooter motors
+    // command to spin up shooter motors - probably will be DEPRECATED when motor tuning is completed
     public Command spinup = new RunToVelocity(controller,.15).requires(this);  // initial spin up command (with delay) that may not be needed
 
     // command to stop
