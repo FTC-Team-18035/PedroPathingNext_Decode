@@ -64,6 +64,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
                 telemetry.addData("Target Area", llResult.getTa());
                 telemetry.addData("Botpose", botPose.toString());
             }
+
+            telemetry.addData("pinpoint x", pinpoint.getPosition().getX(DistanceUnit.MM));
+            telemetry.addData("pinpoint y", pinpoint.getPosition().getY(DistanceUnit.MM));
+            telemetry.addData("pinpoint heading", pinpoint.getPosition().getHeading(AngleUnit.DEGREES));
+
             telemetry.update();
         }
 
