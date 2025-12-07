@@ -14,8 +14,8 @@ public class Trajectory {
         double launchVelocity = ((1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)))* 1.23787177960363;  //12.21730476; //The launch velocity in cm/s
 
         double launchAngle = Math.toDegrees(rawlaunchAngle) * .00392157;
-                                             // TODO - min/max filtering to remain within hardware limits ?
-        return new double[] { launchVelocity, launchAngle }; // these are the target for the shooter's flywheel and servo angle adjustments
+
+        return new double[] { launchVelocity, launchAngle }; // these are the targets for the shooter's flywheel and servo angle adjustments
     }
 }
 
