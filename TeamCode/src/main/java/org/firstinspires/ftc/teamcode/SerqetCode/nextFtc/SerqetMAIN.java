@@ -4,7 +4,7 @@ import static dev.nextftc.bindings.Bindings.button;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
+// import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
@@ -100,17 +100,14 @@ public class SerqetMAIN extends NextFTCOpMode {
 
             // TODO - test TURBO button feature moved to onUpdate() and mapping function in the driverControlled constructor
 
-            // Bind shooting actions to gamepad1.a
-            button(() -> gamepad1.a)
-                    //.whenBecomesTrue(Shooter.INSTANCE.spinup)             // may not be helpful - a delay in shoot command (Subsystem level) may be best
-                    .whenTrue(
-                        () -> {double[] trajPair = Trajectory.Calculate(210);  // Testing in TestMAIN on 12/6
-                        Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)
-                        .and(Vault.INSTANCE.outtake);})
-
-
-                    .whenBecomesFalse(Vault.INSTANCE.stop)
-                    .whenFalse(Shooter.INSTANCE.stop);
+                        // Bind shooting actions to gamepad1.a
+                        // Shooter button binding (gamepad1.a) - persistent command while held
+                        button(() -> gamepad1.a)
+                                .whenTrue(() -> {
+                                        double[] trajPair = calculateTrajectory(210);
+                                        Shooter.INSTANCE.shootPersistent(trajPair[0], trajPair[1], 0).and(Vault.INSTANCE.outtake).schedule();
+                                })
+                                .whenFalse(() -> Shooter.INSTANCE.stop.schedule());
 
             // Bind LIFT activation to button
             button(() -> gamepad1.dpad_up)
@@ -133,21 +130,21 @@ public class SerqetMAIN extends NextFTCOpMode {
 
 
         @Override
-        public void onUpdate() {            // code to run during loop()
-            double[] trajPairTelemetry = Trajectory.Calculate(500);
-            telemetry.addData("trajectory feedback", trajPairTelemetry[0]);
-            telemetry.addData("angle feedback", trajPairTelemetry[1]);
-            telemetry.update();
+                public void onUpdate() {            // code to run during loop()
+                        BindingManager.update();
+                        // TURBO button: scales drivetrain
+                        dtScalar = (gamepad1.left_trigger > 0.1) ? 1 : 0.5;
 
-            BindingManager.update();                // this is what checks for the gamepad input during loop
-            if (gamepad1.left_trigger > 0.1) {      // TURBO button via brute force
-                dtScalar = 1;
-            }
-            else {
-                dtScalar = 0.5;
-            }
-
-        }
+                        // Telemetry for shooter
+                        double[] trajPairTelemetry = calculateTrajectory(500);
+                        double shooterTargetVelocity = trajPairTelemetry[0];
+                        telemetry.addData("Trajectory X (target ticks/s)", shooterTargetVelocity);
+                        telemetry.addData("Trajectory Y (angle)", trajPairTelemetry[1]);
+                        // If possible, get actual shooter velocity from subsystem (example shown, adjust as needed):
+                        // double actualVelocity = Shooter.INSTANCE.getActualVelocity();
+                        // telemetry.addData("Shooter Actual Velocity", actualVelocity);
+                        telemetry.update();
+                }
 
         @Override
         public void onStop() {               // code to run once on stop()
@@ -155,11 +152,18 @@ public class SerqetMAIN extends NextFTCOpMode {
             BindingManager.reset();         // this is just housekeeping at the end of teleOp
         }
 
-        // Testing in TestMAIN on 12/6
-        // private void Limelight3A() {
-        //
-        // }
-        // private void pinpoint() {
-        //
-        // }
+
+                // Local replacement for Trajectory.Calculate
+                private double[] calculateTrajectory(double targetDistance) {
+                        double distance = targetDistance;
+                        double g = 980.0; // cm/s^2 magnitude of acceleration due to gravity
+                        double y0 = 53.0; // cm, target final height in goal
+                        double m = Math.min(-1.5, (-200.0 - y0) / distance); // The SLOPE with which an artifact will enter the goal with. NOT AN ANGLE
+                        double a = -(y0 / Math.pow(distance, 2)) + (m / distance); // The "a" value in the parabola equation
+                        double b = ((2.0 * y0) / distance) - m; // The "b" value in the parabola equation
+                        double rawlaunchAngle = Math.atan(b); // The launch angle in radians
+                        double launchVelocity = ((1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)))* 1.23787177960363;
+                        double launchAngle = Math.toDegrees(rawlaunchAngle) * .00392157;
+                        return new double[] { launchVelocity, launchAngle };
+                }
 }

@@ -48,11 +48,45 @@ public class Shooter implements Subsystem {
             .basicFF(0.00055,0,0)
             .build();
 
-    // command to call when aiming and shooting action is attempted
-    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
-        return new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)                  // servo angle adjustment // TODO FUTURE make the shooter servos into a group to make sure that they run at the same time
-                .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))           // may need a delay here ???
+
+    // Persistent shooter command: keeps velocity setpoint as long as scheduled
+    public Command shootPersistent(double launchVelocity, double launchAngle, double aimAngle) {
+        return new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)
+                .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))
+                .and(new PersistentRunToVelocity(controller, launchVelocity).requires(this));
+    }
+
+    // Legacy shoot for compatibility (non-persistent)
+    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {
+        return new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)
+                .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))
                 .and(new RunToVelocity(controller, launchVelocity).requires(this));
+    }
+
+    // Persistent RunToVelocity command implementation
+    public static class PersistentRunToVelocity extends Command {
+        private final ControlSystem controller;
+        private final double velocity;
+        public PersistentRunToVelocity(ControlSystem controller, double velocity) {
+            this.controller = controller;
+            this.velocity = velocity;
+        }
+        @Override
+        public void initialize() {
+            controller.setTarget(velocity);
+        }
+        @Override
+        public void execute() {
+            controller.setTarget(velocity);
+        }
+        @Override
+        public boolean isFinished() {
+            return false; // Never finishes on its own
+        }
+        @Override
+        public void end(boolean interrupted) {
+            controller.setTarget(0);
+        }
     }
 
 
