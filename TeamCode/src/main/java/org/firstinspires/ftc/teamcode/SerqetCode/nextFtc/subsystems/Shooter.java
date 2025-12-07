@@ -37,9 +37,6 @@ public class Shooter implements Subsystem {
     //      new FeedbackServoEx("shooter_vertical" , 0 , 0.0 )      // unsure of this-need to research
     //      new FeedbackServoEx("shooter_horizontal" , 0 , 0.0 ));  // FeedbackServoEx documentation
 
-
-    // TODO - program servos to be mirrored and work in unison
-    // TODO - verify motor directions
     private MotorGroup shooterGroup = new MotorGroup(
             new MotorEx("left_shooter"),
             new MotorEx("right_shooter").reversed());
