@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import static dev.nextftc.bindings.Bindings.button;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
@@ -78,6 +80,7 @@ public class SerqetMAIN extends NextFTCOpMode {
             // TODO - this function has not been verified although motor direction has
             //final Command holdClear = Lift.INSTANCE.holdClear;
             //holdClear.schedule();
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         }
 
         // Actions to take/ button bindings when START is pressed
