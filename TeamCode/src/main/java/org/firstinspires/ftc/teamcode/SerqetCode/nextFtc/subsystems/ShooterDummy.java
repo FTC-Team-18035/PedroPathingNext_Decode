@@ -17,10 +17,10 @@ public class ShooterDummy implements Subsystem {
 
     public static final ShooterDummy INSTANCE = new ShooterDummy();
     private ShooterDummy() { }
-    private static double closePower = 0;
-    private static double farPower = 0;
-    private static double closeAimAngle = 0;
-    private static double farAimAngle = 0;
+    public static double closePower = 0;
+    public static double farPower = 0;
+    public static double closeAimAngle = 0;
+    public static double farAimAngle = 0;
 
     private ServoGroup servoGroup = new ServoGroup(
             new ServoEx("horizontal_servo"),
