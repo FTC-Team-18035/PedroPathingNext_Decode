@@ -12,6 +12,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.ServoGroup;
 import dev.nextftc.hardware.positionable.SetPosition;
+import dev.nextftc.hardware.powerable.SetPower;
 
 @Configurable
 public class Shooter implements Subsystem {
@@ -48,11 +49,14 @@ public class Shooter implements Subsystem {
             .build();
 
     // command to call when aiming and shooting action is attempted
-    public void shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
+    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {
+        return new SetPower(leftShooter, 1); // Commented out the old one and replaced it with this temporarily because it was giving an error
+    }
+    /*public void shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
          new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)                  // servo angle adjustment // TODO FUTURE make the shooter servos into a group to make sure that they run at the same time
                 .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))           // may need a delay here ???
                 .and(new RunToVelocity(controller, launchVelocity).requires(this)).schedule();
-    }
+    } */
 
 
     // command to spin up shooter motors - probably will be DEPRECATED when motor tuning is completed
