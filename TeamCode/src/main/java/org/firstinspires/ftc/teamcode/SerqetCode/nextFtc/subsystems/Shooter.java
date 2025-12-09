@@ -37,22 +37,21 @@ public class Shooter implements Subsystem {
     //      new FeedbackServoEx("shooter_vertical" , 0 , 0.0 )      // unsure of this-need to research
     //      new FeedbackServoEx("shooter_horizontal" , 0 , 0.0 ));  // FeedbackServoEx documentation
 
-    private MotorGroup shooterGroup = new MotorGroup(
-            new MotorEx("left_shooter"),
-            new MotorEx("right_shooter").reversed());
+    private final MotorEx leftShooter = new MotorEx("left_shooter");
+    private final MotorEx rightShooter = new MotorEx("right_shooter").reversed();
 
     // PID for the SHOOTER motors
 
     private ControlSystem controller = ControlSystem.builder()
             .velPid(0.008, 0, 0)
-            .basicFF(0.00055,0,0)
+            .basicFF(0.0000055,0,0)
             .build();
 
     // command to call when aiming and shooting action is attempted
-    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
-        return new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)                  // servo angle adjustment // TODO FUTURE make the shooter servos into a group to make sure that they run at the same time
+    public void shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
+         new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)                  // servo angle adjustment // TODO FUTURE make the shooter servos into a group to make sure that they run at the same time
                 .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))           // may need a delay here ???
-                .and(new RunToVelocity(controller, launchVelocity).requires(this));
+                .and(new RunToVelocity(controller, launchVelocity).requires(this)).schedule();
     }
 
 
@@ -69,6 +68,9 @@ public class Shooter implements Subsystem {
     @Override
     public void initialize(){
 
+        leftShooter.setPower(0);
+        rightShooter.setPower(0);
+
     }
 
     // this is where actions of this subsystem are automatically called during the loop() of the NextFTC opmodes
@@ -76,7 +78,9 @@ public class Shooter implements Subsystem {
     // make the system set the motors power during each loop cycle to have an effect on the motor
     @Override
     public void periodic(){
-        shooterGroup.setPower(controller.calculate(shooterGroup.getState()));    // update the controller calculations with each loop iteration
+        double calulatedPower = controller.calculate(leftShooter.getState());   // update the controller calculations with each loop iteration
+        leftShooter.setPower(calulatedPower);   // issue power to leader
+        rightShooter.setPower(-calulatedPower); // invert power of opposing wheel
 
 
     }
