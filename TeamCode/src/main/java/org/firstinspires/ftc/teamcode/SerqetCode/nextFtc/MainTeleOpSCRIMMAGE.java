@@ -7,21 +7,23 @@ import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
+import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "MainTeleOp for Scrimmage", group = "PedroPathing")
+@TeleOp(name = "MainTeleOp", group = "PedroPathing")
 public class MainTeleOpSCRIMMAGE extends LinearOpMode {
     private static final double SHOOTER_TARGET_VELOCITY = 500.0; // ticks per second
     private static final double SHOOTER_TARGET_SERVO = 0.205; // within the clamped safe range
     private static final double INTAKE_POWER = 1.0;
     private static final double FEED_POWER = 1.0;
+    private static double DRIVETRAIN_SCALAR = .5;
     private Follower follower;
     private ShooterSubsystemSCRIMMAGE shooter;
     private DcMotorEx intake;
@@ -61,9 +63,15 @@ public class MainTeleOpSCRIMMAGE extends LinearOpMode {
     }
 
     private void drive() {
-        double forward = gamepad1.left_stick_y;
-        double strafe = gamepad1.left_stick_x;
-        double turn = gamepad1.right_stick_x;
+        if (gamepad1.left_trigger > .5){
+            DRIVETRAIN_SCALAR = 1;
+        }
+        else {
+            DRIVETRAIN_SCALAR = .5;
+        }
+        double forward = DRIVETRAIN_SCALAR * gamepad1.left_stick_y;
+        double strafe = DRIVETRAIN_SCALAR * gamepad1.left_stick_x;
+        double turn = DRIVETRAIN_SCALAR * gamepad1.right_stick_x;
         follower.setTeleOpDrive(forward, strafe, turn, false, 0.0);
     }
 
@@ -92,9 +100,19 @@ public class MainTeleOpSCRIMMAGE extends LinearOpMode {
             double Velocity = TrajectorySCRIMMAGE.CalculateVelocity(targetDistance);
             double Angle = TrajectorySCRIMMAGE.CalculateAngle(targetDistance);
             shooter.setTarget(Velocity, Angle);
-         //   shooter.setTarget(SHOOTER_TARGET_VELOCITY, SHOOTER_TARGET_SERVO);
+            //   shooter.setTarget(SHOOTER_TARGET_VELOCITY, SHOOTER_TARGET_SERVO);
             shooter.setFeedPower(-1);
-        } else {
+        }
+        else if (gamepad1.y) {
+            //--------------------------------
+            //shooter.Calculate(210);
+            double Velocity = TrajectorySCRIMMAGE.CalculateVelocity(220);
+            double Angle = TrajectorySCRIMMAGE.CalculateAngle(220);
+            shooter.setTarget(Velocity, Angle);
+            //   shooter.setTarget(SHOOTER_TARGET_VELOCITY, SHOOTER_TARGET_SERVO);
+            shooter.setFeedPower(-1);
+        }
+        else {
             shooter.stop();
         }
     }
