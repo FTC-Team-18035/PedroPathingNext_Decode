@@ -26,8 +26,8 @@ public class TImeBasedShootAndScootSCRIMMAGE extends LinearOpMode {
         backLeft = hardwareMap.get(DcMotorEx.class, "back_left");
         backRight = hardwareMap.get(DcMotorEx.class, "back_right");
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -39,23 +39,23 @@ public class TImeBasedShootAndScootSCRIMMAGE extends LinearOpMode {
 
         waitForStart();
 
-        shooter.setTarget(shooterVelocity, shooterAngle);
+        /*shooter.setTarget(shooterVelocity, shooterAngle);
         shooter.setFeedPower(-1);
+        shooter.update();
 
-        sleep(7000);
+        wait(7000); */
 
         frontLeft.setPower(.5);
         frontRight.setPower(.5);
         backLeft.setPower(.5);
         backRight.setPower(.5);
 
-        sleep(2000);
+        sleep(500);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
     }
-
 
 }

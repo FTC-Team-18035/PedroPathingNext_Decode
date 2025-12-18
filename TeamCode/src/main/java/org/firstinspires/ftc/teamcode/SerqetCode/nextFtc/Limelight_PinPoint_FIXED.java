@@ -73,8 +73,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
         }
 
         private double getDistance(double ta) {
-            double scale = 30000.0; // TODO: measure to get actual scale
-            return scale / ta;
+            double distance = Math.pow(4931.375/ta, 0.60233) ; //based on mycurvefit equation, solved for distance
+            return distance;
         }
 
         private void configurePinpoint() {

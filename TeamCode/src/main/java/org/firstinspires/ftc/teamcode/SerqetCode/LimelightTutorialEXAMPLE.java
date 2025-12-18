@@ -5,6 +5,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
+@TeleOp
 public class LimelightTutorialEXAMPLE extends OpMode {
 
     private Limelight3A limelight;
@@ -53,8 +55,8 @@ public class LimelightTutorialEXAMPLE extends OpMode {
     }
 
     public double getDistanceFromTage(double ta) {
-        double scale = 0; // TODO input scale from measuring distances
-        double distance = (scale / ta);
+
+        double distance = Math.pow(4931.375/ta, 0.60233) ; //based on mycurvefit equation, solved for distance
 
         return distance;
     }
