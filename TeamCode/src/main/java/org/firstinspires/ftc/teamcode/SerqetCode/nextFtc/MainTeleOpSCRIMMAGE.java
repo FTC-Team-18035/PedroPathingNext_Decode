@@ -37,7 +37,7 @@ public class MainTeleOpSCRIMMAGE extends LinearOpMode {
         shooter = new ShooterSubsystemSCRIMMAGE(hardwareMap);
         //vault = hardwareMap.get(Servo.class, "vault_release");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         MecanumConstants mecanumConstants = new MecanumConstants()
                 .leftFrontMotorName("front_left")
