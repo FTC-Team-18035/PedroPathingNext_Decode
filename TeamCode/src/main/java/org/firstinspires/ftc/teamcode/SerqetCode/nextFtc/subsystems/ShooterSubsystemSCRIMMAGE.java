@@ -41,7 +41,7 @@ public class ShooterSubsystemSCRIMMAGE {
     //Trajectory calculation based on targetDistance
     //-----------------------------------------------------
     public static double[] Calculate(double targetDistance) {
-        double distance = targetDistance;
+        double distance = targetDistance + 15;
         // define values used for all calculations
         double g = 980.0; // cm/s^2 magnitude of acceleration due to gravity
         double y0 = 53.0; // cm, target final height in goal

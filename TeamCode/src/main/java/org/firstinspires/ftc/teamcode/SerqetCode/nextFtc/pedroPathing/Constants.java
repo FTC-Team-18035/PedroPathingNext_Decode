@@ -16,9 +16,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 //TODO Set the weight, Check deadwheel directions
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(5); // Weight in Kilograms
+            .mass(13.517052626) // Weight in Kilograms
+            .forwardZeroPowerAcceleration(-37.737917217396856);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+   // public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
@@ -26,14 +27,16 @@ public class Constants {
             .rightRearMotorName("back_right")
             .leftRearMotorName("back_left")
             .leftFrontMotorName("front_left")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .xVelocity(71.85215795321727)
+            .yVelocity(57.83920888825666);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-70.70786) //  updated 12/6
-            .strafePodX(-94.9706) // updated 12/6
+            .forwardPodY(3.739) // updated 12/23        //  updated 12/6     -70.70786
+            .strafePodX(2.759)  // updated 12/23        // updated 12/6       -94.9706
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
@@ -44,7 +47,7 @@ public class Constants {
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pinpointLocalizer(localizerConstants)
-                .pathConstraints(pathConstraints)
+                //.pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
