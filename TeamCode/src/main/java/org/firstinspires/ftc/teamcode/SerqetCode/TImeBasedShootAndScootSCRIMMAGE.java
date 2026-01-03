@@ -48,8 +48,8 @@ public class TImeBasedShootAndScootSCRIMMAGE extends LinearOpMode {
             shooter.update();
         }
 
+        shooter.stop();
         shooter.setFeedPower(0);
-        shooter.update();
 
         frontLeft.setPower(.5);
         frontRight.setPower(.5);

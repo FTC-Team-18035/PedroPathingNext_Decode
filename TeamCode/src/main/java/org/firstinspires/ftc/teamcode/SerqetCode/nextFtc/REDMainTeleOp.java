@@ -75,7 +75,7 @@ public class REDMainTeleOp extends LinearOpMode {
     private Limelight3A limelight;
     private Follower follower;
     private ShooterSubsystemSCRIMMAGE shooter;
-    private DcMotorEx intake;
+    private DcMotorEx intake, lift;
 
     /* =========================================================
        SHOOTING STATE MACHINE
@@ -117,6 +117,11 @@ public class REDMainTeleOp extends LinearOpMode {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        lift = hardwareMap.get(DcMotorEx.class, "lift");
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(8); // AprilTag pipeline
         limelight.start();
@@ -144,6 +149,7 @@ public class REDMainTeleOp extends LinearOpMode {
             handleDrive();
             handleIntake();
             handleShootingStateMachine();
+            handleLift();
 
             shooter.update();
             follower.update();
@@ -340,5 +346,12 @@ public class REDMainTeleOp extends LinearOpMode {
         shooter.stop();
         shooter.setFeedPower(0.0);
         smoothedDistanceCm = null;
+    }
+
+    private void handleLift() {
+        if(gamepad1.dpad_up) {
+            lift.setTargetPosition(1200);
+            lift.setPower(.75);
+        }
     }
 }
