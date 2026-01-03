@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import static dev.nextftc.bindings.Bindings.button;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -16,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
-import org.firstinspires.ftc.teamcode.SerqetCode.TrajectoryManual;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
@@ -25,7 +22,6 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Vault;
 import java.util.List;
 
 import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -34,36 +30,41 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.driving.DriverControlledCommand;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
-import dev.nextftc.hardware.impl.Direction;
-import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
-import static dev.nextftc.bindings.Bindings.*;
 
-import java.util.List;
+/*
+  *  Current MAIN teleop status:
+  *
+  *  Drivetrain is active inside MAIN and should be moved to a Subsystem
+  *  Robotcentric is current control mode
+  *
+  *  INTAKE is active
+  *  VAULT is active
+  *  SHOOTER is active
+  *  LIFT is deactivated        // TODO - create software or mechanical solution for lift stabilization until endgame
+  *  LIMELIGHT is operating and in feature development  TODO - verify function and calibrate with Apriltag reading measurements
+  *  PINPOINT is functioning IMU  TODO - verify pinpoint setup and accuracy
+  *
+  *  Control layout  TODO - test and get driver feedback for layout
+  *
+  *  GAMEPAD1
+  *  left_trigger is TurboMode
+  *  left_bumper is INTAKE EJECT
+  *  right_bumper is INTAKE
+  *  dpad_up if activate LIFT
+  *  a is SHOOT
+  *
+  *  GAMEPAD2               TODO - make these features automatic in code when proven working
+  *  a is start limelight   // these should happen during autonomous for targeted INTAKE and SHOOTING and NAVIGATION by Apriltags
+  *  b is stop limelight    // and automatically after successful INTAKE/and scoring during teleop for power savings
+  *  x is reset pinpoint position // this should happen after successful limelight Apriltag localization to update robots global position
+  */
 
-/*  Current MAIN teleop status:
 
-    Drivetrain is active inside MAIN and should be moved to a Subsystem
-    Robotcentric is current control mode
+@TeleOp(name = "1st LL/PP features")
 
-    INTAKE is active
-    VAULT is active
-    SHOOTER is active
-
-    Control layout (all are gamepad1)  TODO - test and get driver feedback for layout
-
-    left_trigger is variable TurboMode
-    right_bumper is INTAKE
-    left_bumper is REVERSE INTAKE
-    a is SHOOT
-*/
-
-
-@Config
-@TeleOp(name = "Serqet test")
-
-public class SerqetNextFtcTeleOp extends NextFTCOpMode {
-    public SerqetNextFtcTeleOp() {
+public class TestMAIN extends NextFTCOpMode {
+    public TestMAIN() {
         addComponents(
                 // new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
                 //  DEACTIVATED FOR 12-6 TESTING
@@ -75,7 +76,8 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
                 BindingsComponent.INSTANCE
         );
     }
-    private String telemetryValue = null;
+
+    private final String telemetryValue = null;
 
     // Names for DECODE season robot SERQET
 
@@ -88,7 +90,7 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
     public double dtScalar = 0.5; // Drivetrain scalar variable to set default to half power - could be calibrated to ANY VALUE upon testing
                                   // TODO - decide if Turbo feature is a hindrance and DEPRECATE if so
     public int aprilTag;
-    public static double defaultDistance = 200;
+    double defaultDistance = 200;
     double llDistance = defaultDistance;  // default distance of shooter in cm ???
 
     // Actions to take when opmode is INITIALIZED
@@ -117,28 +119,35 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
                 frontRight,
                 backLeft,
                 backRight,
-                Gamepads.gamepad1().leftStickY().negate(),      //.map((x) -> {return x * dtScalar;}),
-                Gamepads.gamepad1().leftStickX(),               //.map((x) -> {return x * dtScalar;}),
-                Gamepads.gamepad1().rightStickX()             //.map((x) -> {return x * dtScalar;})
+                Gamepads.gamepad1().leftStickY().negate().map((x) -> {return x * dtScalar;}),
+                Gamepads.gamepad1().leftStickX().map((x) -> {return x * dtScalar;}),
+                Gamepads.gamepad1().rightStickX().map((x) -> {return x * dtScalar;})
                 // new HolonomicMode.FieldCentric(imu)  // needed for Pedro field centric
         );
 
         driverControlled.schedule();
 
-            // TODO - test TURBO button feature moved to onUpdate() and mapping function in the driverControlled constructor
+        // ****** GAMEPAD1 controls ******
+
+        // Bind TURBO button to gamepad1.left_trigger  TODO - this button replaces the previous IF statement in onUpdate loop - 90% confidence on this implementation
+        button(() -> gamepad1.left_trigger > 0.1 )      // TODO - if unsuccessful comment out and uncomment IF statement in onUpdate loop
+                .whenBecomesTrue(() -> {dtScalar = 1;})                        // scale to full power
+                .whenBecomesFalse(() -> {dtScalar = 0.5;});                    // default to half power
 
         // Bind shooting actions to gamepad1.a
-        button  (() -> gamepad1.a)
+        button(() -> gamepad1.a)
                 // .whenBecomesTrue(Shooter.INSTANCE.spinup)  DEPRECATED UPON DISCUSSION WITH MECHANICAL
                 .whenBecomesTrue(() -> {
-                    double[] trajPair = TrajectoryManual.Calculate(llDistance);               // this is limelight informed trajectory method calculation call
+                    double[] trajPair = Trajectory.Calculate(llDistance);               // this is limelight informed trajectory method calculation call
                     new Delay(0.1);                                                // delay added to the sequence just for fun
                     Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)        // this is calculated shooting minus any fine tuning for horizontal aim
                             .and(Vault.INSTANCE.outtake); })                            // TODO - test feature and develop fine tuning
 
-
-                    .whenBecomesFalse(Vault.INSTANCE.stop)
-                    .whenFalse(Shooter.INSTANCE.stop);
+                // TODO - Have PinPoint help hold position for actively stabilized shooting
+                // possibly get position-switch to Pedro controlled to maintain-when shooting is finished then
+                // switch to driverControlled
+                .whenBecomesFalse(Vault.INSTANCE.stop.and(Shooter.INSTANCE.stop))
+                .whenFalse(Shooter.INSTANCE.stop);
 
         /*  DEACTIVATED FOR 12-6 testing
         // Bind LIFT activation to button
@@ -148,10 +157,8 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
 
         // Bind INTAKE actions to button
         button(() -> gamepad1.right_bumper)
-                .whenTrue(Intake.INSTANCE.run
-                    .and(Vault.INSTANCE.intake))               // activate INTAKE and VAULT for getting artifacts
-                .whenFalse(Intake.INSTANCE.stop
-                    .and(Vault.INSTANCE.stop));                // de-activate INTAKE and VAULT
+                .whenTrue(Intake.INSTANCE.run.and(Vault.INSTANCE.intake))           // activate INTAKE and VAULT for getting artifacts
+                .whenFalse(Intake.INSTANCE.stop.and(Vault.INSTANCE.stop));          // de-activate INTAKE and VAULT
 
         // TODO - determine if we need to move the vault while ejecting
         button(() -> gamepad1.left_bumper)
@@ -192,14 +199,13 @@ public class SerqetNextFtcTeleOp extends NextFTCOpMode {
             telemetry.addData("botPose", pose2D.toString());
             telemetry.update();
 
-
-
+        /* DEPRECATED FEATURE but saved in case turbo button via button binding fails  TODO - test and remove if binding is successful
+        dtScalar = (gamepad1.left_trigger > 0.1) ? 1:0.5;      // TURBO button via brute force
+        */
     }
 
-
     @Override
-    public void onStop(){               // code to run once on stop()
-        // in stop(), or in NextFTC, onStop():
+    public void onStop() {               // code to run once on stop()
         BindingManager.reset();         // this is just housekeeping at the end of teleOp
     }
 

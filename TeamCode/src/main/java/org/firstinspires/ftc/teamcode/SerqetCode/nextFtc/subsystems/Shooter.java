@@ -7,9 +7,12 @@ import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.controllable.MotorGroup;
 import dev.nextftc.hardware.controllable.RunToVelocity;
+import dev.nextftc.hardware.impl.FeedbackServoEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
+import dev.nextftc.hardware.positionable.ServoGroup;
 import dev.nextftc.hardware.positionable.SetPosition;
+import dev.nextftc.hardware.powerable.SetPower;
 
 @Configurable
 public class Shooter implements Subsystem {
@@ -22,6 +25,7 @@ public class Shooter implements Subsystem {
 
     public static final Shooter INSTANCE = new Shooter();       // public INSTANCE of this class to give access
 
+    public double servoAngle;
     private Shooter() { }                                       // private object of this class
 
     // Declare servos and motors
@@ -29,38 +33,47 @@ public class Shooter implements Subsystem {
     private final ServoEx servoHorizontal = new ServoEx("shooter_horizontal");
 
 
-    // TODO - verify motor directions
-    private MotorGroup shooterGroup = new MotorGroup(
-            new MotorEx("left_shooter").reversed(),
-            new MotorEx("right_shooter"));
+    // TODO - FUTURE REFINEMENT: program as servogroup with feedback
+    // private final ServoGroup aimGroup = new ServoGroup(
+    //      new FeedbackServoEx("shooter_vertical" , 0 , 0.0 )      // unsure of this-need to research
+    //      new FeedbackServoEx("shooter_horizontal" , 0 , 0.0 ));  // FeedbackServoEx documentation
+
+    private final MotorEx leftShooter = new MotorEx("left_shooter");
+    private final MotorEx rightShooter = new MotorEx("right_shooter").reversed();
 
     // PID for the SHOOTER motors
-    // TODO - program servos
-    // TODO - tune PID values  - change to public static to view on panels
+
     private ControlSystem controller = ControlSystem.builder()
-            .velPid(0.0001, 0, 0.001)
-            .basicFF(0.001,0,0)
+            .velPid(0.008, 0, 0)
+            .basicFF(0.0000055,0,0)
             .build();
 
     // command to call when aiming and shooting action is attempted
-    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
-        return new SetPosition(servoHorizontal,aimAngle).requires(servoHorizontal)                  // servo angle adjustment
-                .and(new SetPosition(servoVertical, launchAngle).requires(servoVertical))           // may need a delay here ???
-                .and(new RunToVelocity(controller, launchVelocity).requires(this));
+    public Command shoot(double launchVelocity, double launchAngle, double aimAngle) {
+        return new SetPower(leftShooter, 1); // Commented out the old one and replaced it with this temporarily because it was giving an error
     }
+    /*public void shoot(double launchVelocity, double launchAngle, double aimAngle) {              // feed calculated values into motor control and servos
+         new SetPosition(servoHorizontal, checkIfSafe(launchAngle)).requires(servoHorizontal)                  // servo angle adjustment // TODO FUTURE make the shooter servos into a group to make sure that they run at the same time
+                .and(new SetPosition(servoVertical, checkIfSafe(launchAngle)).requires(servoVertical))           // may need a delay here ???
+                .and(new RunToVelocity(controller, launchVelocity).requires(this)).schedule();
+    } */
 
-    // TODO - command to reset servos to a default angle of "0" horizontal and "??" vertical or incorporate into "stop"
 
-    // command to spin up shooter motors
-    public Command spinup = new RunToVelocity(controller,.5).requires(this).thenWait(0.05);  // initial spin up command (with delay) that may not be needed
+    // command to spin up shooter motors - probably will be DEPRECATED when motor tuning is completed
+    public Command spinup = new RunToVelocity(controller,1).requires(this);  // initial spin up command (with delay) that may not be needed
 
     // command to stop
-    public Command stop = new RunToVelocity(controller, 0).requires(this);  // stop shooter motors by setting controller goal to 0
+    public Command stop = new RunToVelocity(controller, 0).requires(this)  // stop flywheels
+            .and(new SetPosition(servoHorizontal,.1809).requires(this)      // reset to min angle
+            .and(new SetPosition(servoVertical,.1809).requires(this))) ;    // reset to min angle
 
 
     // this is where actions of this subsystem can be automatically run upon pushing the INIT button
     @Override
     public void initialize(){
+
+        leftShooter.setPower(0);
+        rightShooter.setPower(0);
 
     }
 
@@ -69,7 +82,22 @@ public class Shooter implements Subsystem {
     // make the system set the motors power during each loop cycle to have an effect on the motor
     @Override
     public void periodic(){
-        shooterGroup.setPower(controller.calculate(shooterGroup.getState()));    // update the controller calculations with each loop iteration
+        double calulatedPower = controller.calculate(leftShooter.getState());   // update the controller calculations with each loop iteration
+        leftShooter.setPower(calulatedPower);   // issue power to leader
+        rightShooter.setPower(-calulatedPower); // invert power of opposing wheel
+
+
+    }
+
+    public double checkIfSafe(double servoAngle) {
+        double newAngle = servoAngle;
+        if (servoAngle >= .2306) {
+            newAngle = .2306;
+        }
+        if (servoAngle <= .1809) {
+            newAngle = .1809;
+        }
+        return newAngle;
     }
 
 }

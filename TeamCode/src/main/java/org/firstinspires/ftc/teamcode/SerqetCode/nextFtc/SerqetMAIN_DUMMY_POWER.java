@@ -9,11 +9,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.SerqetCode.Trajectory;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Lift;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterDummy;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Vault;
 
 import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
@@ -27,7 +26,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 
 @TeleOp(name = "Serqet TURBO Test")
 
-public class SerqetMAIN extends NextFTCOpMode {
+public class SerqetMAIN_DUMMY_POWER extends NextFTCOpMode {
 
 /*  Current MAIN teleop status:
 
@@ -49,12 +48,12 @@ public class SerqetMAIN extends NextFTCOpMode {
 */
 
 
-    public SerqetMAIN() {
+    public SerqetMAIN_DUMMY_POWER() {
             addComponents(
                     new SubsystemComponent(Lift.INSTANCE),    // enable LIFT system
                     new SubsystemComponent(Intake.INSTANCE),    // enable INTAKE system
                     new SubsystemComponent(Vault.INSTANCE),    // enable VAULT system
-                    new SubsystemComponent(Shooter.INSTANCE),    // enable SHOOTER system
+                    new SubsystemComponent(ShooterDummy.INSTANCE),    // enable SHOOTER system
 
                     BulkReadComponent.INSTANCE,
                     BindingsComponent.INSTANCE
@@ -103,17 +102,22 @@ public class SerqetMAIN extends NextFTCOpMode {
 
             // TODO - test TURBO button feature moved to onUpdate() and mapping function in the driverControlled constructor
 
-            // Bind shooting actions to gamepad1.a
+            // Bind close shooting actions to gamepad1.a
             button(() -> gamepad1.a)
                     //.whenBecomesTrue(Shooter.INSTANCE.spinup)             // may not be helpful - a delay in shoot command (Subsystem level) may be best
-                    .whenTrue(
-                        () -> {double[] trajPair = Trajectory.Calculate(210);  // Testing in TestMAIN on 12/6
-                        Shooter.INSTANCE.shoot(trajPair[0], trajPair[1], 0)
-                        .and(Vault.INSTANCE.outtake);})
-
+                    .whenTrue( ShooterDummy.INSTANCE.shootClose
+                        .and(Vault.INSTANCE.outtake))
 
                     .whenBecomesFalse(Vault.INSTANCE.stop)
-                    .whenFalse(Shooter.INSTANCE.stop);
+                    .whenBecomesFalse(ShooterDummy.INSTANCE.stopMotors);
+
+            // Bind far shooting actions to gamepad1.x
+            button(() -> gamepad1.x)
+                    .whenTrue(ShooterDummy.INSTANCE.shootFar
+                            .and(Vault.INSTANCE.outtake))
+
+                    .whenBecomesFalse(Vault.INSTANCE.stop)
+                    .whenBecomesFalse(ShooterDummy.INSTANCE.stopMotors);
 
             // Bind LIFT activation to button
             button(() -> gamepad1.dpad_up)

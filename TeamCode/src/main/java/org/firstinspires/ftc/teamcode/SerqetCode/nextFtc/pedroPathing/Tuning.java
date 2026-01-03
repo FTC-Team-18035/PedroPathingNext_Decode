@@ -28,7 +28,6 @@ import com.pedropathing.util.PoseHistory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SerqetCode.pedroPathing.ConstantsOLD;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,10 +84,10 @@ public class Tuning extends SelectableOpMode {
     @Override
     public void onSelect() {
         if (follower == null) {
-            follower = ConstantsOLD.createFollower(hardwareMap);
+            follower = Constants.createFollower(hardwareMap);
             PanelsConfigurables.INSTANCE.refreshClass(this);
         } else {
-            follower = ConstantsOLD.createFollower(hardwareMap);
+            follower = Constants.createFollower(hardwareMap);
         }
 
         follower.setStartingPose(new Pose());
@@ -535,7 +534,7 @@ class LateralVelocityTuner extends OpMode {
  */
 class ForwardZeroPowerAccelerationTuner extends OpMode {
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = 30;
+    public static double VELOCITY = 67;
 
     private double previousVelocity;
     private long previousTimeNano;
@@ -639,7 +638,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
  */
 class LateralZeroPowerAccelerationTuner extends OpMode {
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = 30;
+    public static double VELOCITY = 55;
     private double previousVelocity;
     private long previousTimeNano;
     private boolean stopping;

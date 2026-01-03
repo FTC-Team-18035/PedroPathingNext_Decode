@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.SerqetCode;
 
-public class Trajectory {
+public class TrajectoryManual {
+
+    public static double manualLaunchVel;
+    public static double manualLaunchAngle;
     public static double[] Calculate(double targetDistance) {
         double distance = targetDistance;
         // define values used for all calculations
@@ -11,17 +14,10 @@ public class Trajectory {
         double b = ((2.0 * y0) / distance) - m; // The "b" value in the parabola equation
         double rawlaunchAngle = Math.atan(b); // The launch angle in radians
         //Degraded (hopefully) double launchVelocity = (1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a));
-        double launchVelocity = ((1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)))* 1.23787177960363;  //12.21730476; //The launch velocity in cm/s
+        double launchVelocity = manualLaunchVel; //((1.0 / Math.cos(rawlaunchAngle)) * Math.sqrt(g / (2.0 * a)))* 1.23787177960363;  //12.21730476; //The launch velocity in cm/s
 
-        double launchAngle = Math.toDegrees(rawlaunchAngle) * .00392157;
+        double launchAngle = manualLaunchAngle; //Math.toDegrees(rawlaunchAngle) * .00392157;
 
         return new double[] { launchVelocity, launchAngle }; // these are the targets for the shooter's flywheel and servo angle adjustments
     }
 }
-
-
-
-
-
-
-

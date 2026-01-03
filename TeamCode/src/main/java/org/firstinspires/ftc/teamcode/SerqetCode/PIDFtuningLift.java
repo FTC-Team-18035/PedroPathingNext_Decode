@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.SerqetCode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,15 +12,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Configurable
 @TeleOp
-public class PIDtuningLift extends OpMode {
+public class PIDFtuningLift extends OpMode {
 
-    private PIDController LiftController;
+    private PIDFController LiftController;
 
-    public static double lp = 0,
-            li = 0,
-            ld = 0;
-
-    public static double lf = 0;
+    public static double lp = 0, li = 0, ld = 0, lf = 0;
 
     public static int liftTarget = 0;
 
@@ -30,12 +24,11 @@ public class PIDtuningLift extends OpMode {
 
     private DcMotorEx Lift;
 
+    private static TelemetryManager panelsTelemetry;
 
     @Override
     public void init(){
-        LiftController = new PIDController(lp, li, ld);
-
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        LiftController = new PIDFController(lp, li, ld, lf);
 
         Lift = hardwareMap.get(DcMotorEx.class, "lift");
 
@@ -43,17 +36,18 @@ public class PIDtuningLift extends OpMode {
 
         Lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+
     }
 
     @Override
     public void loop(){
-        LiftController.setPID(lp, li, ld);
 
+        LiftController.setPIDF(lp, li, ld, lf);
 
         int liftPos = Lift.getCurrentPosition();
 
         double lPID = LiftController.calculate(liftPos, liftTarget);
-
 
         double liftFF = Math.cos(Math.toRadians(liftTarget / lift_ticks_in_degrees)) * lf;
 
@@ -61,10 +55,12 @@ public class PIDtuningLift extends OpMode {
 
         Lift.setPower(liftPower);
 
-        telemetry.addData("Lift pos ", liftPos);
-        telemetry.addData("lift target ", liftTarget);
-        telemetry.update();
+        double error = liftTarget - liftPos;
 
+        panelsTelemetry.debug("Lift pos " + liftPos);
+        panelsTelemetry.debug("lift target " + liftTarget);
+        panelsTelemetry.debug( "error " + error + "close enough for gov't work!");
+        panelsTelemetry.update(telemetry);
     }
 
 }
