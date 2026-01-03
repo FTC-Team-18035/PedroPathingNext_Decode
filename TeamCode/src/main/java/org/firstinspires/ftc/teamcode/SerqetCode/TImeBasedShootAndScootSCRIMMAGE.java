@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Drivetrain;
@@ -17,6 +18,7 @@ public class TImeBasedShootAndScootSCRIMMAGE extends LinearOpMode {
 
     private DcMotorEx frontLeft, frontRight, backLeft, backRight;
     private ShooterSubsystemSCRIMMAGE shooter;
+    private ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -38,12 +40,16 @@ public class TImeBasedShootAndScootSCRIMMAGE extends LinearOpMode {
         double shooterAngle = TrajectorySCRIMMAGE.CalculateAngle(345.12);
 
         waitForStart();
+        timer.reset();
 
-        /*shooter.setTarget(shooterVelocity, shooterAngle);
-        shooter.setFeedPower(-1);
+        while (timer.seconds() < 7) {
+            shooter.setTarget(shooterVelocity, shooterAngle);
+            shooter.setFeedPower(-1);
+            shooter.update();
+        }
+
+        shooter.setFeedPower(0);
         shooter.update();
-
-        wait(7000); */
 
         frontLeft.setPower(.5);
         frontRight.setPower(.5);

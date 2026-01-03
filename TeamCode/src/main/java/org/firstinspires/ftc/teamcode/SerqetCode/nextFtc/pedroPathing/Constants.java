@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing;
 
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -13,14 +14,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
-//TODO Set the weight, Check deadwheel directions
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(13.517052626) // Weight in Kilograms
-            .forwardZeroPowerAcceleration(-37.737917217396856);
+            .mass(13.739052626) // Weight in Kilograms 13.517052626
+            .forwardZeroPowerAcceleration(-37.737917217396856)
+            .lateralZeroPowerAcceleration(-76.35089741287847)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.13, 0, 0, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.45, 0 ,.0006 ,0));
 
-   // public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
-
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, .8, 1);
+        // tValue is how much of the path it needs to travel before it is considered complete
+        // timeout is how much time we are giving the robot to correct itself at the end of the path
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
             .rightFrontMotorName("front_right")
@@ -47,7 +51,7 @@ public class Constants {
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pinpointLocalizer(localizerConstants)
-                //.pathConstraints(pathConstraints)
+                .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
