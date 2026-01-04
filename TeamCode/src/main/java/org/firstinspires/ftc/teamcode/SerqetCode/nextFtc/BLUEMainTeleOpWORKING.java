@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
 @TeleOp(name = "BLUE Main TeleOp", group = "PedroPathing")
-public class BLUEMainTeleOp extends LinearOpMode {
+public class BLUEMainTeleOpWORKING extends LinearOpMode {
 
     /* =========================================================
        LIMELIGHT GEOMETRY CONSTANTS
@@ -120,6 +120,7 @@ public class BLUEMainTeleOp extends LinearOpMode {
         lift = hardwareMap.get(DcMotorEx.class, "lift");
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setTargetPosition(0);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -350,8 +351,8 @@ public class BLUEMainTeleOp extends LinearOpMode {
 
     private void handleLift() {
         if(gamepad1.dpad_up) {
-            lift.setTargetPosition(1200);
-            lift.setPower(.75);
+            lift.setTargetPosition(3600);
+            lift.setPower(1);
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing;
 
+import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
@@ -19,10 +20,10 @@ public class Constants {
             .mass(13.739052626) // Weight in Kilograms 13.517052626
             .forwardZeroPowerAcceleration(-37.737917217396856)
             .lateralZeroPowerAcceleration(-76.35089741287847)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.13, 0, 0, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(1.45, 0 ,.0006 ,0));
-
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, .8, 1);
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0, 0.026))  //0.13, 0, 0, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(.9, 0, .001, .031))     //1.45, 0 ,.0006 ,0));
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0, 0, 0, 0.6, 0));
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, .4, 1);
         // tValue is how much of the path it needs to travel before it is considered complete
         // timeout is how much time we are giving the robot to correct itself at the end of the path
     public static MecanumConstants driveConstants = new MecanumConstants()
