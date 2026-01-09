@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "RED Main TeleOp", group = "PedroPathing")
+@TeleOp(name = "RED Main TeleOp *TEST*", group = "PedroPathing")
 public class REDMainTeleOp extends LinearOpMode {
 
     /* =========================================================
@@ -52,6 +52,8 @@ public class REDMainTeleOp extends LinearOpMode {
 
     // Counts consecutive loops without improvement
     private int alignStallCounter = 0;
+    private static MecanumConstants mecanumConstants;
+    private static PinpointConstants pinpointConstants;
 
     /* =========================================================
        SHOOTER SAFETIES & FILTERING
@@ -65,6 +67,8 @@ public class REDMainTeleOp extends LinearOpMode {
 
     // Exponential smoothing factor for distance calculation
     private static final double ALPHA = 0.3;
+    private static double turn;
+    private static BezierPoint point;
 
     // Telemetry values
     public double leftError;
@@ -108,6 +112,7 @@ public class REDMainTeleOp extends LinearOpMode {
        ========================================================= */
     private long lastTagSeenTimeMs = 0;
 
+    private double heading = 0;
     @Override
     public void runOpMode() {
 
@@ -126,15 +131,16 @@ public class REDMainTeleOp extends LinearOpMode {
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(8); // AprilTag pipeline
+        limelight.start();
 
         /* ---------------- Drive / Localization Setup ---------------- */
-        MecanumConstants mecanumConstants = new MecanumConstants()
+        mecanumConstants = new MecanumConstants()
                 .leftFrontMotorName("front_left")
                 .leftRearMotorName("back_left")
                 .rightFrontMotorName("front_right")
                 .rightRearMotorName("back_right");
 
-        PinpointConstants pinpointConstants = new PinpointConstants()
+        pinpointConstants = new PinpointConstants()
                 .hardwareMapName("pinpoint");
 
         follower = new FollowerBuilder(new FollowerConstants(), hardwareMap)
@@ -147,22 +153,23 @@ public class REDMainTeleOp extends LinearOpMode {
 
         /* ---------------- Main Loop ---------------- */
         while (opModeIsActive()) {
-            handleDrive();
+
             handleIntake();
             handleShootingStateMachine();
             handleLift();
-            resetFieldCentric();        //TODO Calls the resetFieldCentric method located on line 369
+            handleDrive();
 
             shooter.update();
             follower.update();
             telemetry.update();
 
-            if(gamepad1.a) {
-                limelight.start();      // TODO Changed this so the limelight is only active when we are shooting
+            /*if(shootState != ShootState.IDLE) {
+                follower.holdPoint(point, follower.getHeading());
             }
             else {
-                limelight.stop();
-            }
+                follower.breakFollowing();
+                handleDrive();
+            }*/
         }
 
         limelight.stop();
@@ -177,12 +184,15 @@ public class REDMainTeleOp extends LinearOpMode {
 
         double scalar = gamepad1.left_trigger > 0.5 ? 1.0 : 0.5;
 
+        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
+            heading = follower.getHeading();
+        }
         follower.setTeleOpDrive(
                 scalar * gamepad1.left_stick_y,
                 scalar * gamepad1.left_stick_x,
                 scalar * gamepad1.right_stick_x,
                 false,
-                0.0
+                heading
         );
     }
 
@@ -217,6 +227,7 @@ public class REDMainTeleOp extends LinearOpMode {
 
         /* -------- Start shooting sequence -------- */
         if (gamepad1.a && shootState == ShootState.IDLE) {
+            point = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
             shootState = ShootState.ALIGNING;
             bestHeadingErrorDeg = Double.MAX_VALUE;
             alignStallCounter = 0;
@@ -269,7 +280,7 @@ public class REDMainTeleOp extends LinearOpMode {
                 }
 
                 /* ----- Compute turn command ----- */
-                double turn = ALIGN_KP * (-tx);
+                turn = ALIGN_KP * (-tx);
 
                 // Enforce minimum command if still meaningfully off
                 if (Math.abs(turn) < ALIGN_MIN_CMD &&
@@ -277,13 +288,10 @@ public class REDMainTeleOp extends LinearOpMode {
                     turn = Math.copySign(ALIGN_MIN_CMD, turn);
                 }
 
-                follower.setTeleOpDrive(0, 0, turn, false, 0);
-
+                follower.setTeleOpDrive(0, 0, turn, false, heading);
                 /* ----- Exit condition ----- */
                 if (absError <= ALIGN_ACCEPTABLE_ERROR &&
                         alignStallCounter >= ALIGN_STALL_CYCLES) {
-                    BezierPoint point = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
-                    follower.holdPoint(point, turn);
                     shootState = ShootState.SPINNING_UP;
                 }
 
@@ -294,7 +302,8 @@ public class REDMainTeleOp extends LinearOpMode {
                SPINNING UP
                ===================================================== */
             case SPINNING_UP: {
-                follower.setTeleOpDrive(0, 0, 0, false, 0);
+                follower.setTeleOpDrive(0, 0, 0, false, heading);
+
 
                 double distanceMeters =
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
@@ -333,7 +342,7 @@ public class REDMainTeleOp extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
-                follower.setTeleOpDrive(0, 0, 0, false, 0);
+                follower.setTeleOpDrive(0, 0, 0, false, heading);
                 shooter.setFeedPower(-1.0);
                 break;
 
@@ -347,6 +356,8 @@ public class REDMainTeleOp extends LinearOpMode {
         telemetry.addData("Best Align Error (deg)",
                 bestHeadingErrorDeg);
         telemetry.addData("Distance (cm)", targetDistanceCm);
+        telemetry.addData("Pos", point);
+        telemetry.addData("Angle", turn);
     }
 
     /* =========================================================
@@ -360,28 +371,9 @@ public class REDMainTeleOp extends LinearOpMode {
     }
 
     private void handleLift() {
-        if(gamepad1.dpad_up && gamepad1.touchpad_finger_1) {       //TODO Changed it so you have to be touching the touchpad to use the lift
+        if(gamepad1.dpad_up && gamepad1.left_trigger > .75) {       //TODO Changed it so you have to be holding the left trigger to use the lift
             lift.setTargetPosition(3600);
             lift.setPower(1);
-        }
-    }
-
-    private void resetFieldCentric() {
-        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
-            /* ---------------- Drive / Localization Setup ---------------- */
-            MecanumConstants mecanumConstants = new MecanumConstants()
-                    .leftFrontMotorName("front_left")
-                    .leftRearMotorName("back_left")
-                    .rightFrontMotorName("front_right")
-                    .rightRearMotorName("back_right");
-
-            PinpointConstants pinpointConstants = new PinpointConstants()
-                    .hardwareMapName("pinpoint");
-
-            follower = new FollowerBuilder(new FollowerConstants(), hardwareMap)
-                    .mecanumDrivetrain(mecanumConstants)
-                    .pinpointLocalizer(pinpointConstants)
-                    .build();
         }
     }
 }

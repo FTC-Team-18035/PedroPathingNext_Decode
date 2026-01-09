@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "BLUE Main TeleOp", group = "PedroPathing")
+@TeleOp(name = "BLUE Main TeleOp *TEST*", group = "PedroPathing")
 public class BLUEMainTeleOp extends LinearOpMode {
 
     /* =========================================================
@@ -158,12 +158,6 @@ public class BLUEMainTeleOp extends LinearOpMode {
             follower.update();
             telemetry.update();
 
-            if(gamepad1.a) {
-                limelight.start();      //TODO Changed this so the limelight is only active while shooting
-            }
-            else {
-                limelight.stop();
-            }
         }
 
         limelight.stop();
@@ -361,7 +355,7 @@ public class BLUEMainTeleOp extends LinearOpMode {
     }
 
     private void handleLift() {
-        if(gamepad1.dpad_up && gamepad1.touchpad_finger_1) {    //TODO Changed it so you have to be touching the touchpad to run the lift
+        if(gamepad1.dpad_up && gamepad1.left_trigger > .75) {    //TODO Changed it so you have to be holding the left trigger to run the lift
             lift.setTargetPosition(3600);
             lift.setPower(1);
         }

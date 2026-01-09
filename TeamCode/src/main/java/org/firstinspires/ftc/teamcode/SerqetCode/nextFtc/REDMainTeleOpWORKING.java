@@ -106,6 +106,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
        TAG VISIBILITY TRACKING
        ========================================================= */
     private long lastTagSeenTimeMs = 0;
+    private double heading = 0;
 
     @Override
     public void runOpMode() {
@@ -169,12 +170,15 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
 
         double scalar = gamepad1.left_trigger > 0.5 ? 1.0 : 0.5;
 
+        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
+            heading = follower.getHeading();
+        }
         follower.setTeleOpDrive(
                 scalar * gamepad1.left_stick_y,
                 scalar * gamepad1.left_stick_x,
                 scalar * gamepad1.right_stick_x,
                 false,
-                0.0
+                heading
         );
     }
 
@@ -269,7 +273,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
                     turn = Math.copySign(ALIGN_MIN_CMD, turn);
                 }
 
-                follower.setTeleOpDrive(0, 0, turn, false, 0);
+                follower.setTeleOpDrive(0, 0, turn, false, heading);
 
                 /* ----- Exit condition ----- */
                 if (absError <= ALIGN_ACCEPTABLE_ERROR &&
@@ -284,7 +288,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
                SPINNING UP
                ===================================================== */
             case SPINNING_UP: {
-                follower.setTeleOpDrive(0, 0, 0, false, 0);
+                follower.setTeleOpDrive(0, 0, 0, false, heading);
 
                 double distanceMeters =
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
@@ -323,7 +327,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
-                follower.setTeleOpDrive(0, 0, 0, false, 0);
+                follower.setTeleOpDrive(0, 0, 0, false, heading);
                 shooter.setFeedPower(-1.0);
                 break;
 
@@ -350,7 +354,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
     }
 
     private void handleLift() {
-        if(gamepad1.dpad_up) {
+        if(gamepad1.dpad_up && gamepad1.left_trigger > .75) {    //TODO Changed it so you have to be holding the left trigger to run the lift
             lift.setTargetPosition(3600);
             lift.setPower(1);
         }

@@ -45,11 +45,11 @@ public class Pedro_ShooterTest extends OpMode {
             case 0:
                 shooter.setTarget(shooterVelocity, shooterAngle);
                 shooter.setFeedPower(1);
+                setPathState(1);
             case 1:
                 if(actionTimer.getElapsedTimeSeconds() >= 10) {
                     follower.followPath(scorePreload);
                     setPathState(-1);
-                    break;
                 }
             case -1:
                 if(!follower.isBusy()) {
