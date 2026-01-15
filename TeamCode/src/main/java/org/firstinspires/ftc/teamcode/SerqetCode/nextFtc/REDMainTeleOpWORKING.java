@@ -5,7 +5,6 @@ import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
-import com.pedropathing.geometry.BezierPoint;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,8 +14,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "BLUE Main TeleOp *TEST*", group = "PedroPathing")
-public class BLUEMainTeleOp extends LinearOpMode {
+@TeleOp(name = "RED Main TeleOp", group = "PedroPathing")
+public class REDMainTeleOpWORKING extends LinearOpMode {
 
     /* =========================================================
        LIMELIGHT GEOMETRY CONSTANTS
@@ -107,6 +106,7 @@ public class BLUEMainTeleOp extends LinearOpMode {
        TAG VISIBILITY TRACKING
        ========================================================= */
     private long lastTagSeenTimeMs = 0;
+    private double heading = 0;
 
     @Override
     public void runOpMode() {
@@ -125,7 +125,7 @@ public class BLUEMainTeleOp extends LinearOpMode {
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); // AprilTag pipeline
+        limelight.pipelineSwitch(8); // AprilTag pipeline
         limelight.start();
 
         /* ---------------- Drive / Localization Setup ---------------- */
@@ -152,12 +152,10 @@ public class BLUEMainTeleOp extends LinearOpMode {
             handleIntake();
             handleShootingStateMachine();
             handleLift();
-            resetFieldCentric();        //TODO Calls the resetFieldCentric method located on line 370
 
             shooter.update();
             follower.update();
             telemetry.update();
-
         }
 
         limelight.stop();
@@ -172,12 +170,15 @@ public class BLUEMainTeleOp extends LinearOpMode {
 
         double scalar = gamepad1.left_trigger > 0.5 ? 1.0 : 0.5;
 
+        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
+            heading = follower.getHeading();
+        }
         follower.setTeleOpDrive(
                 scalar * gamepad1.left_stick_y,
                 scalar * gamepad1.left_stick_x,
                 scalar * gamepad1.right_stick_x,
                 false,
-                0.0
+                heading
         );
     }
 
@@ -272,13 +273,11 @@ public class BLUEMainTeleOp extends LinearOpMode {
                     turn = Math.copySign(ALIGN_MIN_CMD, turn);
                 }
 
-                follower.setTeleOpDrive(0, 0, turn, false, 0);
+                follower.setTeleOpDrive(0, 0, turn, false, heading);
 
                 /* ----- Exit condition ----- */
                 if (absError <= ALIGN_ACCEPTABLE_ERROR &&
                         alignStallCounter >= ALIGN_STALL_CYCLES) {
-                    BezierPoint point = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());      //TODO Added this to save the current robot position to a BezierPoint
-                    follower.holdPoint(point, turn);    //TODO Added this to hold the position when shooting
                     shootState = ShootState.SPINNING_UP;
                 }
 
@@ -289,7 +288,7 @@ public class BLUEMainTeleOp extends LinearOpMode {
                SPINNING UP
                ===================================================== */
             case SPINNING_UP: {
-                follower.setTeleOpDrive(0, 0, 0, false, 0);
+                follower.setTeleOpDrive(0, 0, 0, false, heading);
 
                 double distanceMeters =
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
@@ -328,7 +327,7 @@ public class BLUEMainTeleOp extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
-                follower.setTeleOpDrive(0, 0, 0, false, 0);
+                follower.setTeleOpDrive(0, 0, 0, false, heading);
                 shooter.setFeedPower(-1.0);
                 break;
 
@@ -358,25 +357,6 @@ public class BLUEMainTeleOp extends LinearOpMode {
         if(gamepad1.dpad_up && gamepad1.left_trigger > .75) {    //TODO Changed it so you have to be holding the left trigger to run the lift
             lift.setTargetPosition(3600);
             lift.setPower(1);
-        }
-    }
-
-    private void resetFieldCentric() {      //TODO Not sure if I did this correctly. Needs tested
-        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
-            /* ---------------- Drive / Localization Setup ---------------- */
-            MecanumConstants mecanumConstants = new MecanumConstants()
-                    .leftFrontMotorName("front_left")
-                    .leftRearMotorName("back_left")
-                    .rightFrontMotorName("front_right")
-                    .rightRearMotorName("back_right");
-
-            PinpointConstants pinpointConstants = new PinpointConstants()
-                    .hardwareMapName("pinpoint");
-
-            follower = new FollowerBuilder(new FollowerConstants(), hardwareMap)
-                    .mecanumDrivetrain(mecanumConstants)
-                    .pinpointLocalizer(pinpointConstants)
-                    .build();
         }
     }
 }
