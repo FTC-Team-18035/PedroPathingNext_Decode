@@ -21,6 +21,7 @@ public class ShooterSubsystemSCRIMMAGE {
     private final Servo pitchServoRight;
     private final Servo vaultRelease;
     private final CRServo vaultFeed;
+    private final CRServo vaultFeed2;
     private final PIDFController leftController;
     private final PIDFController rightController;
     private double targetVelocity;
@@ -32,6 +33,7 @@ public class ShooterSubsystemSCRIMMAGE {
         pitchServoRight = hardwareMap.get(Servo.class, "shooter_vertical");
         vaultRelease = hardwareMap.get(Servo.class, "vault_release");
         vaultFeed = hardwareMap.get(CRServo.class, "vault_feed");
+        vaultFeed2 = hardwareMap.get(CRServo.class, "vault_feed2");
         leftController = new PIDFController(new PIDFCoefficients(0.005, 0, 0, 0.000544));
         rightController = new PIDFController(new PIDFCoefficients(0.005, 0, 0, 0.000544));
         configureMotors();
@@ -93,7 +95,9 @@ public class ShooterSubsystemSCRIMMAGE {
     }
     public void setFeedPower(double power) {
         vaultFeed.setPower(power);
+        vaultFeed2.setPower(power);
     }
+
     public void setPIDFCoefficients(PIDFCoefficients coefficients) {
         // Apply identical gains to both controllers (clone to avoid shared state).
         leftController.setCoefficients(new PIDFCoefficients(coefficients.P, coefficients.I, coefficients.D, coefficients.F));
