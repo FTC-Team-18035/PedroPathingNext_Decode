@@ -36,7 +36,7 @@ public class Constants {
         // tValue is how much of the path it needs to travel before it is considered complete
         // timeout is how much time we are giving the robot to correct itself at the end of the path
     public static MecanumConstants driveConstants = new MecanumConstants()
-            .maxPower(1)
+            .maxPower(.5)
             .rightFrontMotorName("front_right")
             .rightRearMotorName("back_right")
             .leftRearMotorName("back_left")

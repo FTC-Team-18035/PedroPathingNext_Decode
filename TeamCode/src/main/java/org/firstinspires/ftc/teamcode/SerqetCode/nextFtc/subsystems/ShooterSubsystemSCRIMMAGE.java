@@ -94,8 +94,8 @@ public class ShooterSubsystemSCRIMMAGE {
         rightController.reset();
     }
     public void setFeedPower(double power) {
-        vaultFeed.setPower(power);
-        vaultFeed2.setPower(power);
+        vaultFeed.setPower(-power);
+        vaultFeed2.setPower(-power);
     }
 
     public void setPIDFCoefficients(PIDFCoefficients coefficients) {

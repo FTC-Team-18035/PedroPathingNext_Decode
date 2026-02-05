@@ -11,7 +11,7 @@ import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
-@Autonomous(name = "Example Auto", group = "Examples")
+@Autonomous(name = "Serqet auto far", group = "Examples")
  public class Serqet_Auto_Far extends OpMode {
 
     private Follower follower;
@@ -19,17 +19,17 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
     private int pathState;
 
-    private final Pose startPose = new Pose(55.1, 11.1, 90); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(53.6, 13.1, 112); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose startPose = new Pose(56, 7.8, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(53.6, 13.1, Math.toRadians(112)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pose1 = new Pose(55, 11, 112);
-    private final Pose pose2 = new Pose(14,45, 180);
-    private final Pose pose3 = new Pose(53.6, 13.1, 180);
-    private final Pose pose4 = new Pose(41.9,59,112);
-    private final Pose pose5 = new Pose(14.5,58.6,180);
-    private final Pose pose6 = new Pose(53.5,13.4,180);
-    private final Pose pose7 = new Pose(16.2,69.8,112);
-    private final Pose pose8 = new Pose(28, 69.7, 180);
+    private final Pose pose1 = new Pose(55, 11, Math.toRadians(112));
+    private final Pose pose2 = new Pose(14,45, Math.toRadians(180));
+    private final Pose pose3 = new Pose(53.6, 13.1, Math.toRadians(180));
+    private final Pose pose4 = new Pose(41.9,59,Math.toRadians(112));
+    private final Pose pose5 = new Pose(14.5,58.6,Math.toRadians(180));
+    private final Pose pose6 = new Pose(53.5,13.4,Math.toRadians(180));
+    private final Pose pose7 = new Pose(16.2,69.8,Math.toRadians(112));
+    private final Pose pose8 = new Pose(28, 69.7, Math.toRadians(180));
 
 
     private Path scorePreload;
@@ -134,28 +134,28 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
                 }
                 break;
             case 4:
-                if (!follower.isBusy()) ;
+                if (!follower.isBusy())
             {
                 follower.followPath(path4);
                 setPathState(5);
             }
             break;
             case 5:
-                if (!follower.isBusy()) ;
+                if (!follower.isBusy())
             {
                 follower.followPath(path5);
                 setPathState(6);
             }
             break;
             case 6:
-                if (!follower.isBusy()) ;
+                if (!follower.isBusy())
             {
                 follower.followPath(path6);
                 setPathState(7);
             }
             break;
             case 7:
-                if (!follower.isBusy()) ; {
+                if (!follower.isBusy()) {
                 follower.followPath(path7);
                 setPathState(-1);
             }

@@ -11,7 +11,7 @@ import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
-@Autonomous(name = "9 Artifact Blue", group = "Examples")
+@Autonomous(name = "9 Artifact Movement Blue", group = "Examples")
 public class PedroMovementTest9ArtifactBlue extends OpMode {
 
     private Follower follower;
@@ -25,12 +25,45 @@ public class PedroMovementTest9ArtifactBlue extends OpMode {
 
 
     private Path scorePreload;
+    private Path path1;
+    private Path path2;
+    private Path path3;
+    private Path path4;
+    private Path path5;
+    private Path path6;
+    private Path path7;
+    private Path path8;
     private PathChain grabPickup1;
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path1 = new Path(new BezierLine(startPose, scorePose));
+        path1.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path2 = new Path(new BezierLine(startPose, scorePose));
+        path2.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path3 = new Path(new BezierLine(startPose, scorePose));
+        path3.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path4 = new Path(new BezierLine(startPose, scorePose));
+        path4.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path5 = new Path(new BezierLine(startPose, scorePose));
+        path5.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path6 = new Path(new BezierLine(startPose, scorePose));
+        path6.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path7 = new Path(new BezierLine(startPose, scorePose));
+        path7.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
+        path8 = new Path(new BezierLine(startPose, scorePose));
+        path8.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+
 
     /* Here is an example for Constant Interpolation
     scorePreload.setConstantInterpolation(startPose.getHeading()); */
@@ -46,9 +79,11 @@ public class PedroMovementTest9ArtifactBlue extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                follower.followPath(scorePreload);
-                setPathState(1);
+                follower.followPath(path1);
+            {
+                setPathState(3);
                 break;
+            }
             case 1:
 
             /* You could check for
@@ -58,29 +93,71 @@ public class PedroMovementTest9ArtifactBlue extends OpMode {
             */
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Score Preload */
+                if (!follower.isBusy()) {
+                }
+                /* Score Preload */
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup1,true);
-                    setPathState(2);
-                }
-                break;
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                follower.followPath(path2);
+            {
+                setPathState(2);
+            }
+            break;
             case 2:
-                if(!follower.isBusy()) {
-                    setPathState(-1);
+                if (!follower.isBusy()) {
+                    follower.followPath(path3);
+                    setPathState(3);
                 }
                 break;
+            case 3:
+                if (!follower.isBusy()) {
+                    follower.followPath(path4);
+                    setPathState(4);
+                }
+                break;
+            case 4:
+                if (!follower.isBusy()) ;
+            {
+                follower.followPath(path5);
+                setPathState(5);
+            }
+            break;
+            case 5:
+                if (!follower.isBusy()) ;
+            {
+                follower.followPath(path6);
+                setPathState(6);
+            }
+            break;
+            case 6:
+                if (!follower.isBusy()) ;
+            {
+                follower.followPath(path7);
+                setPathState(7);
+            }
+            break;
+            case 7:
+                if (!follower.isBusy()) ;
+            {
+                follower.followPath(path8);
+            }
+            break;
         }
+
     }
 
-    /** These change the states of the paths and actions. It will also reset the timers of the individual switches **/
+
+    /**
+     * These change the states of the paths and actions. It will also reset the timers of the individual switches
+     **/
     public void setPathState(int pState) {
         pathState = pState;
         pathTimer.resetTimer();
     }
 
-    /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
+    /**
+     * This is the main loop of the OpMode, it will run repeatedly after clicking "Play".
+     **/
     @Override
     public void loop() {
 
@@ -96,7 +173,9 @@ public class PedroMovementTest9ArtifactBlue extends OpMode {
         telemetry.update();
     }
 
-    /** This method is called once at the init of the OpMode. **/
+    /**
+     * This method is called once at the init of the OpMode.
+     **/
     @Override
     public void init() {
         pathTimer = new Timer();
@@ -112,12 +191,17 @@ public class PedroMovementTest9ArtifactBlue extends OpMode {
 
     }
 
-    /** This method is called continuously after Init while waiting for "play". **/
+    /**
+     * This method is called continuously after Init while waiting for "play".
+     **/
     @Override
-    public void init_loop() {}
+    public void init_loop() {
+    }
 
-    /** This method is called once at the start of the OpMode.
-     * It runs all the setup actions, including building paths and starting the path system **/
+    /**
+     * This method is called once at the start of the OpMode.
+     * It runs all the setup actions, including building paths and starting the path system
+     **/
     @Override
     public void start() {
         opmodeTimer.resetTimer();
@@ -125,7 +209,10 @@ public class PedroMovementTest9ArtifactBlue extends OpMode {
         setPathState(0);
     }
 
-    /** We do not use this because everything should automatically disable **/
+    /**
+     * We do not use this because everything should automatically disable
+     **/
     @Override
-    public void stop() {}
+    public void stop() {
+    }
 }
