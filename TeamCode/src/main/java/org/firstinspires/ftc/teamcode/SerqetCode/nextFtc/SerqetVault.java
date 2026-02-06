@@ -1,4 +1,4 @@
-/*package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
+package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -23,4 +23,4 @@ public class SerqetVault implements Subsystem {
 
     public Command on = new SetPower(crServoEx,1).requires(this);         //sets the position of CRServoJoe to 1
     public Command off = new SetPower(crServoEx,0).requires(this);        //sets the position of CRServoJoe to 0
-}*/
+}

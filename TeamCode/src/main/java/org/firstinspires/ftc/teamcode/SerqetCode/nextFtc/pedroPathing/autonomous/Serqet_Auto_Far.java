@@ -11,7 +11,7 @@ import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
-@Autonomous(name = "Serqet auto far", group = "Examples")
+@Autonomous(name = "Example Auto", group = "Examples")
  public class Serqet_Auto_Far extends OpMode {
 
     private Follower follower;
@@ -19,28 +19,26 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
     private int pathState;
 
-    private final Pose startPose = new Pose(56, 7.8, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose startPose = new Pose(55.1, 11.1, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(53.6, 13.1, Math.toRadians(112)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pose1 = new Pose(55, 11, Math.toRadians(112));
-    private final Pose pose2 = new Pose(14,45, Math.toRadians(180));
-    private final Pose pose3 = new Pose(53.6, 13.1, Math.toRadians(180));
-    private final Pose pose4 = new Pose(41.9,59,Math.toRadians(112));
-    private final Pose pose5 = new Pose(14.5,58.6,Math.toRadians(180));
-    private final Pose pose6 = new Pose(53.5,13.4,Math.toRadians(180));
-    private final Pose pose7 = new Pose(16.2,69.8,Math.toRadians(112));
-    private final Pose pose8 = new Pose(28, 69.7, Math.toRadians(180));
+    private final Pose pickup1Pose = new Pose(14, 45, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup2Pose = new Pose(14.5,58.6, Math.toRadians(180));
+    private final Pose lineup1Pose = new Pose(55, 11, Math.toRadians(112));
+    private final Pose lineup2Pose = new Pose(41.9,59,Math.toRadians(112));
+    private final Pose empty = new Pose(16.2,69.8,Math.toRadians(112));
+    private final Pose endPose = new Pose(28, 69.7, Math.toRadians(180));
 
 
     private Path scorePreload;
-    private Path path1;
-    private Path path1_5;
-    private Path path2;
-    private Path path3;
-    private Path path4;
-    private Path path5;
-    private Path path6;
-    private Path path7;
+    private Path score1Path;
+    private Path score2Path;
+    private Path readyPath;
+    private Path lineup1Path;
+    private Path lineup2Path;
+    private Path pickup1Path;
+    private Path pickup2Path;
+    private Path emptyPath;
+    private Path endPath;
     private Path path8;
     private PathChain grabPickup1;
 
@@ -49,29 +47,29 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
         scorePreload = new Path(new BezierLine(startPose, scorePose));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
 
-        path1 = new Path(new BezierLine(scorePose, pose1));
-        path1.setLinearHeadingInterpolation(scorePose.getHeading(), pose1.getHeading());
+        readyPath = new Path(new BezierLine(scorePose, lineup1Pose));
+        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading());
 
-        path1_5 = new Path(new BezierLine(pose1, pose2)) ;
-        path1_5.setLinearHeadingInterpolation(pose1.getHeading(), pose2.getHeading());
+        lineup1Path = new Path(new BezierLine(lineup1Pose, pickup1Pose)) ;
+        lineup1Path.setLinearHeadingInterpolation(lineup1Pose.getHeading(), pickup1Pose.getHeading());
 
-        path2 = new Path(new BezierLine(pose2, scorePose));
-        path2.setLinearHeadingInterpolation(pose2.getHeading(), scorePose.getHeading());
+        pickup1Path = new Path(new BezierLine(pickup1Pose, scorePose));
+        pickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading());
 
-        path3 = new Path(new BezierLine(scorePose, pose4 ));
-        path3.setLinearHeadingInterpolation(scorePose.getHeading(), pose4.getHeading());
+        score1Path = new Path(new BezierLine(scorePose, lineup2Pose ));
+        score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading());
 
-        path4 = new Path(new BezierLine(pose4, pose5));
-        path4.setLinearHeadingInterpolation(pose4.getHeading(), pose5.getHeading());
+        lineup2Path = new Path(new BezierLine(lineup2Pose, pickup2Pose));
+        lineup2Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading());
 
-        path5 = new Path(new BezierLine(pose5, scorePose));
-        path5.setLinearHeadingInterpolation(pose5.getHeading(), scorePose.getHeading());
+        pickup2Path = new Path(new BezierLine(pickup2Pose, scorePose));
+        pickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading());
 
-        path6 = new Path(new BezierLine(scorePose, pose7));
-        path6.setLinearHeadingInterpolation(scorePose.getHeading(), pose7.getHeading());
+        score2Path = new Path(new BezierLine(scorePose, empty));
+        score2Path.setLinearHeadingInterpolation(scorePose.getHeading(), empty.getHeading());
 
-        path7 = new Path(new BezierLine(pose7, pose8));
-        path7.setLinearHeadingInterpolation(pose7.getHeading(), pose8.getHeading());
+        emptyPath = new Path(new BezierLine(empty, endPose));
+        emptyPath.setLinearHeadingInterpolation(empty.getHeading(), endPose.getHeading());
 
         /*path8 = new Path(new BezierLine(pose8, pose8));
         path8.setLinearHeadingInterpolation(pose8.getHeading(), pose8.getHeading());
@@ -110,53 +108,53 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
                 /* Score Preload */
 
                 /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                follower.followPath(path1);
+                follower.followPath(readyPath);
             {
                 setPathState(1_5);
             }
             break;
             case 1_5:
                 if (!follower.isBusy()) {
-                    follower.followPath(path1_5);
+                    follower.followPath(lineup1Path);
                     setPathState(2);
                 }
                 break;
             case 2:
                 if (!follower.isBusy()) {
-                    follower.followPath(path2);
+                    follower.followPath(pickup1Path);
                     setPathState(3);
                 }
                 break;
             case 3:
                 if (!follower.isBusy()) {
-                    follower.followPath(path3);
+                    follower.followPath(score1Path);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if (!follower.isBusy())
+                if (!follower.isBusy()) ;
             {
-                follower.followPath(path4);
+                follower.followPath(lineup2Path);
                 setPathState(5);
             }
             break;
             case 5:
-                if (!follower.isBusy())
+                if (!follower.isBusy()) ;
             {
-                follower.followPath(path5);
+                follower.followPath(pickup2Path);
                 setPathState(6);
             }
             break;
             case 6:
-                if (!follower.isBusy())
+                if (!follower.isBusy()) ;
             {
-                follower.followPath(path6);
+                follower.followPath(score2Path);
                 setPathState(7);
             }
             break;
             case 7:
-                if (!follower.isBusy()) {
-                follower.followPath(path7);
+                if (!follower.isBusy()) ; {
+                follower.followPath(emptyPath);
                 setPathState(-1);
             }
             break;
