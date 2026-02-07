@@ -6,6 +6,9 @@ import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.geometry.BezierPoint;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -117,6 +120,19 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
     private long lastTagSeenTimeMs = 0;
 
     private double heading = 0;
+
+    /* =========================================================
+       AUTO ALIGN (one-shot tx)
+       ========================================================= */
+    private boolean alignStarted = false;
+    private Pose holdPose;
+    private Path alignPath;
+
+    private static double wrapDeg(double deg) {
+        while (deg > 180) deg -= 360;
+        while (deg <= -180) deg += 360;
+        return deg;
+    }
     @Override
     public void runOpMode() {
 
@@ -235,28 +251,76 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
             bestHeadingErrorDeg = Double.MAX_VALUE;
             smoothedDistanceCm = null;
             shootState = ShootState.ALIGNING;
+
+            // We'll grab tx once in ALIGNING and start a turn path that holds the endpoint.
+            alignStarted = false;
+            holdPose = null;
+            alignPath = null;
+        }
+
+        // Always update Limelight result once per loop so other states can safely use it.
+        result = limelight.getLatestResult();
+        boolean tagValid = result != null && result.isValid()
+                && !result.getFiducialResults().isEmpty();
+
+        if (tagValid) {
+            lastTagSeenTimeMs = System.currentTimeMillis();
+        }
+
+        /* -------- Safety: lost tag -------- */
+        if (shootState != ShootState.IDLE &&
+                System.currentTimeMillis() - lastTagSeenTimeMs > TAG_TIMEOUT_MS) {
+            abortShot();
+            return;
         }
 
         switch (shootState) {
             case ALIGNING: {
-                LLResult result = limelight.getLatestResult();
-                boolean tagValid = result != null && result.isValid()
-                        && !result.getFiducialResults().isEmpty();
+                if (!tagValid) break;
 
-                if (tagValid) {
-                    lastTagSeenTimeMs = System.currentTimeMillis();
+                // Manual override → skip alignment and keep scoring
+                if (gamepad1.b) {
+                    shootState = ShootState.SPINNING_UP;
+                    break;
                 }
 
-                /* -------- Safety: lost tag -------- */
-                if (shootState != ShootState.IDLE &&
-                        System.currentTimeMillis() - lastTagSeenTimeMs > TAG_TIMEOUT_MS) {
-                    abortShot();
-                    return;
+                // Poll tx ONCE, then start a short path that ends with hold=true.
+                if (!alignStarted) {
+                    double tx = result.getTx() + 2; // your existing offset
+
+                    double startHeadingDeg = follower.getHeading();
+                    offsetHeading = wrapDeg(startHeadingDeg + tx);
+
+                    // Hold position is the pose at button press, just with an updated heading.
+                    holdPose = new Pose(
+                            follower.getPose().getX(),
+                            follower.getPose().getY(),
+                            offsetHeading
+                    );
+
+                    // Make a tiny "turn" path (very small translation) so Pedro engages path follower,
+                    // and then holds the end pose to fight defense.
+                    Pose startPose = new Pose(
+                            follower.getPose().getX(),
+                            follower.getPose().getY(),
+                            follower.getPose().getHeading()
+                    );
+                    Pose endPose = new Pose(
+                            follower.getPose().getX() + 0.5,
+                            follower.getPose().getY(),
+                            offsetHeading
+                    );
+
+                    alignPath = new Path(new BezierLine(startPose, endPose));
+                    alignPath.setConstantHeadingInterpolation(offsetHeading);
+                    follower.followPath(alignPath, true);
+                    alignStarted = true;
                 }
-                // Horizontal offset from Limelight (degrees)
-                double tx = result.getTx() + 2;
-                point = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
-                offsetHeading = follower.getHeading() + tx;
+
+                // Once the follower finishes, it will hold the end pose (because hold=true).
+                if (!follower.isBusy()) {
+                    shootState = ShootState.SPINNING_UP;
+                }
 
                 break;
             }
@@ -265,7 +329,9 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                SPINNING UP
                ===================================================== */
             case SPINNING_UP: {
-                follower.holdPoint(point, offsetHeading);
+        // DON'T overwrite Pedro's hold-at-end with teleop commands.
+        // We just let the follower continue holding the end of the ALIGNING path.
+        if (!tagValid) break;
 
                 double distanceMeters =
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
@@ -304,7 +370,7 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
-                follower.holdPoint(point, offsetHeading);
+                // Continue holding end pose autonomously
                 shooter.setFeedPower(-1.0);
                 break;
 
@@ -330,6 +396,13 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
         shooter.stop();
         shooter.setFeedPower(0.0);
         smoothedDistanceCm = null;
+
+        alignStarted = false;
+        holdPose = null;
+        alignPath = null;
+
+        // Restore driver controls
+        follower.startTeleOpDrive();
     }
 
     private void handleLift() {
