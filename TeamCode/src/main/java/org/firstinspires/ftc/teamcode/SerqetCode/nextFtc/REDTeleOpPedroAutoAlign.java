@@ -93,10 +93,10 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
        SHOOTING STATE MACHINE
        ========================================================= */
     private enum ShootState {
-        IDLE,        // Driver control
-        ALIGNING,    // Vision-based heading refinement
-        SPINNING_UP, // Flywheel + hood positioning
-        FEEDING      // Launch the note
+        IDLE,
+        ALIGNING,
+        SPINNING_UP,
+        FEEDING
     }
 
     private ShootState shootState = ShootState.IDLE;
