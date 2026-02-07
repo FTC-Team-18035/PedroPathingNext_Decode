@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "RED Main TeleOp *TEST*", group = "PedroPathing")
+@TeleOp//(name = "RED Main TeleOp *TEST*", group = "PedroPathing")
 public class REDTeleOpPedroAutoAlign extends LinearOpMode {
 
     /* =========================================================
@@ -83,6 +83,8 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
     private Follower follower;
     private ShooterSubsystemSCRIMMAGE shooter;
     private DcMotorEx intake, lift;
+
+    public LLResult result;
 
     /* =========================================================
        SHOOTING STATE MACHINE
@@ -230,30 +232,27 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
         /* -------- Start shooting sequence -------- */
         if (gamepad1.a && shootState == ShootState.IDLE) {
             point = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
-            shootState = ShootState.ALIGNING;
             bestHeadingErrorDeg = Double.MAX_VALUE;
-            alignStallCounter = 0;
             smoothedDistanceCm = null;
-        }
-
-        LLResult result = limelight.getLatestResult();
-        boolean tagValid = result != null && result.isValid()
-                && !result.getFiducialResults().isEmpty();
-
-        if (tagValid) {
-            lastTagSeenTimeMs = System.currentTimeMillis();
-        }
-
-        /* -------- Safety: lost tag -------- */
-        if (shootState != ShootState.IDLE &&
-                System.currentTimeMillis() - lastTagSeenTimeMs > TAG_TIMEOUT_MS) {
-            abortShot();
-            return;
+            shootState = ShootState.ALIGNING;
         }
 
         switch (shootState) {
             case ALIGNING: {
+                LLResult result = limelight.getLatestResult();
+                boolean tagValid = result != null && result.isValid()
+                        && !result.getFiducialResults().isEmpty();
 
+                if (tagValid) {
+                    lastTagSeenTimeMs = System.currentTimeMillis();
+                }
+
+                /* -------- Safety: lost tag -------- */
+                if (shootState != ShootState.IDLE &&
+                        System.currentTimeMillis() - lastTagSeenTimeMs > TAG_TIMEOUT_MS) {
+                    abortShot();
+                    return;
+                }
                 // Horizontal offset from Limelight (degrees)
                 double tx = result.getTx() + 2;
                 point = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
