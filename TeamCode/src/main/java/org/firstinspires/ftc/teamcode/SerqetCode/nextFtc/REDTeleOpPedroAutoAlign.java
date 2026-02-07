@@ -286,10 +286,10 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
 
                 // Poll tx ONCE, then start a short path that ends with hold=true.
                 if (!alignStarted) {
-                    double tx = result.getTx() + 2; // your existing offset
+                    double tx = Math.toRadians(result.getTx() + 2); // your existing offset
 
-                    double startHeadingDeg = follower.getHeading();
-                    offsetHeading = wrapDeg(startHeadingDeg + tx);
+                    double startHeading = follower.getHeading();
+                    offsetHeading = startHeading + tx;
 
                     // Hold position is the pose at button press, just with an updated heading.
                     holdPose = new Pose(
@@ -318,7 +318,7 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                 }
 
                 // Once the follower finishes, it will hold the end pose (because hold=true).
-                if (!follower.isBusy()) {
+                if (follower.getHeadingError() < Math.toRadians(1)) {
                     shootState = ShootState.SPINNING_UP;
                 }
 
@@ -332,7 +332,7 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
         // DON'T overwrite Pedro's hold-at-end with teleop commands.
         // We just let the follower continue holding the end of the ALIGNING path.
         if (!tagValid) break;
-
+                follower.followPath(alignPath, true);
                 double distanceMeters =
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
                                 Math.tan(Math.toRadians(result.getTy()
@@ -370,6 +370,7 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
+                follower.followPath(alignPath, true);
                 // Continue holding end pose autonomously
                 shooter.setFeedPower(-1.0);
                 break;
