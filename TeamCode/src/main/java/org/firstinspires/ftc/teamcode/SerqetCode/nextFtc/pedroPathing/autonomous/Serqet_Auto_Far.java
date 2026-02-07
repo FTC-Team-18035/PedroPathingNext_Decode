@@ -91,8 +91,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
     private int pathState;
 
-    private final Pose startPose = new Pose(53.6,/*55.1, 11.1*/13.1, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(55.1,/*53.6, 13.1*/11.1, Math.toRadians(112)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose startPose = new Pose(55.1, 11.1, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(53.6, 14/*11.1*/, Math.toRadians(112)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose pickup1Pose = new Pose(14, 45, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose pickup2Pose = new Pose(14.5,58.6, Math.toRadians(180));
     private final Pose lineup1Pose = new Pose(55, 11, Math.toRadians(112));
