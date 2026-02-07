@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
 @TeleOp(name = "RED Main TeleOp *TEST*", group = "PedroPathing")
-public class REDMainTeleOp extends LinearOpMode {
+public class REDTeleOpPedroAutoAlign extends LinearOpMode {
 
     /* =========================================================
        LIMELIGHT GEOMETRY CONSTANTS

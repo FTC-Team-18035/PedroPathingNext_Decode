@@ -2,19 +2,91 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.autonomou
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "Example Auto", group = "Examples")
+@Autonomous(name = "Serqet Auto Far", group = "Examples")
  public class Serqet_Auto_Far extends OpMode {
 
+    private static final double SHOOT_SECONDS = 4.5;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
+
+    private static final double MAX_DRIVE_SPEED = .5; // Change this for the max speed
+    private static final double MAX_INTAKE_SPEED = .3; // Change this if we need to intake slower
+    private static final double DRIVE_POWER = 0.7;
+    private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
+
+    // Optional start delay so you can avoid alliance partners.
+    private static final double START_DELAY_SECONDS = 0; //TODO: add delay if need to wait for alliance partner to complete tasks
+
+    // If robot drives the wrong direction, flip this between -1 and +1.
+    private static final double FORWARD_SIGN = 1.0;
+
+    /* =========================================================
+       LIMELIGHT GEOMETRY CONSTANTS (matches TeleOp)
+       ========================================================= */
+    private static final double LIMELIGHT_HEIGHT = 0.24;
+    private static final double TARGET_HEIGHT = 0.75;
+    private static final double LIMELIGHT_MOUNT_ANGLE = 13.0;
+
+    /* =========================================================
+       ALIGNMENT CONTROL CONSTANTS (matches TeleOp)
+       ========================================================= */
+    private static final double ALIGN_KP = -0.015;
+    private static final double ALIGN_MIN_CMD = 0.09;
+    private static final double ALIGN_ACCEPTABLE_ERROR = 0.35;
+    private static final double ALIGN_MIN_IMPROVEMENT = 0.02;
+    private static final int ALIGN_STALL_CYCLES = 8;
+    private static final double ALIGN_TIMEOUT_SECONDS = 3.0;
+
+    // Blue-side horizontal offset used in BLUEMainTeleOpWORKING
+    private static final double BLUE_TX_OFFSET_DEG = -2.0;
+
+    /* =========================================================
+       SHOOTER FILTERING / SAFETIES
+       ========================================================= */
+    private static final double ALPHA = 0.3;
+    private static final double DEFAULT_DISTANCE_CM = 260.0; // fallback if tag isn't visible
+
+    /* =========================================================
+       HOLD (to keep robot stable while shooting)
+       ========================================================= */
+    private static final double HOLD_HEADING_KP = 1.8;
+    private static final double HOLD_MAX_TURN = 0.45;
+    private static final double HOLD_MIN_TURN_CMD = 0.06;
+    private static final double HOLD_HEADING_DEADBAND_RAD = Math.toRadians(1.0);
+
+    private Limelight3A limelight;
+
     private Follower follower;
+    private ShooterSubsystemSCRIMMAGE shooter;
+
+    private DcMotorEx intake;
+
+    private int alignStallCounter = 0;
+    private double bestHeadingErrorDeg = Double.MAX_VALUE;
+
+    private Double smoothedDistanceCm = null;
+    private double targetDistanceCm = DEFAULT_DISTANCE_CM;
+
+    private BezierPoint holdPoint = null;
+    private double holdHeadingRad = 0.0;
+    private boolean holdInitialized = false;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int pathState;
@@ -104,12 +176,12 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if (!follower.isBusy()) {
-                }
+
                 /* Score Preload */
 
                 /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                 follower.followPath(readyPath);
-            {
+
                 setPathState(1_5);
             }
             break;
@@ -121,43 +193,64 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
                 break;
             case 2:
                 if (!follower.isBusy()) {
+                    intake.setPower(1);
+                    shooter.setFeedPower(-1);
+                    follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(pickup1Path);
                     setPathState(3);
                 }
                 break;
             case 3:
                 if (!follower.isBusy()) {
+                    intake.setPower(0);
+                    shooter.setFeedPower(0);
+                    follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(score1Path);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if (!follower.isBusy()) ;
+                if (!follower.isBusy())
             {
-                follower.followPath(lineup2Path);
-                setPathState(5);
+               // shootForTime(SHOOT_SECONDS);
+                if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
+                    follower.followPath(lineup2Path);
+                    setPathState(5);
+                }
             }
             break;
             case 5:
-                if (!follower.isBusy()) ;
+                if (!follower.isBusy())
             {
+                intake.setPower(1);
+                shooter.setFeedPower(-1);
+                follower.setMaxPower(MAX_INTAKE_SPEED);
                 follower.followPath(pickup2Path);
                 setPathState(6);
             }
             break;
             case 6:
-                if (!follower.isBusy()) ;
+                if (!follower.isBusy())
             {
+                intake.setPower(0);
+                shooter.setFeedPower(0);
+                follower.setMaxPower(MAX_DRIVE_SPEED);
                 follower.followPath(score2Path);
                 setPathState(7);
             }
             break;
             case 7:
-                if (!follower.isBusy()) ; {
-                follower.followPath(emptyPath);
-                setPathState(-1);
+                if (!follower.isBusy()) {
+                    if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
+                        follower.followPath(emptyPath);
+                        setPathState(-1);
+                    }
             }
             break;
+            case -1:
+                if (!follower.isBusy()) {
+                    requestOpModeStop();
+                }
 
         }
 
@@ -203,6 +296,17 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
 
         follower = Constants.createFollower(hardwareMap);
+        follower.setMaxPower(MAX_DRIVE_SPEED);
+        shooter = new ShooterSubsystemSCRIMMAGE(hardwareMap);
+
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(6); // matches BLUEMainTeleOpWORKING
+        limelight.start();
+
         buildPaths();
         follower.setStartingPose(startPose);
 
@@ -231,5 +335,87 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
      **/
     @Override
     public void stop() {
+    }
+
+    private double shootForTime(double seconds) {
+        ElapsedTime timer = new ElapsedTime();
+
+        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds) {
+            follower.update();
+            updateHold();
+
+            updateDistanceAndShooterTarget();
+
+            shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+            shooter.update();
+
+            telemetry.addData("Shooting (s)", timer.seconds());
+            //telemetry.addData("Distance (cm)", targetDistanceCm);
+            telemetry.update();
+        }
+        return timer.seconds();
+    }
+
+    private void updateDistanceAndShooterTarget() {
+        LLResult result = limelight.getLatestResult();
+        boolean tagValid = result != null && result.isValid()
+                && result.getFiducialResults() != null
+                && !result.getFiducialResults().isEmpty();
+
+        double distanceCm = targetDistanceCm;
+
+        if (tagValid) {
+            double distanceMeters = (TARGET_HEIGHT - LIMELIGHT_HEIGHT)
+                    / Math.tan(Math.toRadians(result.getTy() + LIMELIGHT_MOUNT_ANGLE));
+            distanceCm = distanceMeters * 100.0;
+        }
+
+        smoothedDistanceCm = smoothedDistanceCm == null
+                ? distanceCm
+                : ALPHA * distanceCm + (1 - ALPHA) * smoothedDistanceCm;
+
+        targetDistanceCm = smoothedDistanceCm;
+
+        double targetVelocity = TrajectorySCRIMMAGE.CalculateVelocity(targetDistanceCm);
+        double targetAngle = TrajectorySCRIMMAGE.CalculateAngle(targetDistanceCm);
+        shooter.setTarget(targetVelocity, targetAngle);
+    }
+
+    private void beginHoldFromCurrentPose() {
+        if (holdInitialized) return;
+        holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
+        holdHeadingRad = follower.getPose().getHeading();
+        holdInitialized = true;
+    }
+
+
+    private void updateHold() {
+        if (!holdInitialized) {
+            beginHoldFromCurrentPose();
+        }
+
+        double headingError = angleWrapRad(holdHeadingRad - follower.getPose().getHeading());
+        double turn = HOLD_HEADING_KP * headingError;
+
+        if (Math.abs(headingError) < HOLD_HEADING_DEADBAND_RAD) {
+            turn = 0.0;
+        } else {
+            if (Math.abs(turn) < HOLD_MIN_TURN_CMD) {
+                turn = Math.copySign(HOLD_MIN_TURN_CMD, turn);
+            }
+            turn = clamp(turn, -HOLD_MAX_TURN, HOLD_MAX_TURN);
+        }
+
+        follower.holdPoint(holdPoint, turn);
+    }
+
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private static double angleWrapRad(double radians) {
+        while (radians > Math.PI) radians -= 2.0 * Math.PI;
+        while (radians < -Math.PI) radians += 2.0 * Math.PI;
+        return radians;
     }
 }
