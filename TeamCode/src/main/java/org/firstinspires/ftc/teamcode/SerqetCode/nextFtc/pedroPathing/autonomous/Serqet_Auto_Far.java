@@ -117,31 +117,31 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading(), .8);
 
         readyPath = new Path(new BezierLine(scorePose, lineup1Pose));
-        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading());
+        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading(), .8);
 
         lineup1Path = new Path(new BezierLine(lineup1Pose, pickup1Pose)) ;
-        lineup1Path.setLinearHeadingInterpolation(lineup1Pose.getHeading(), pickup1Pose.getHeading());
+        lineup1Path.setLinearHeadingInterpolation(lineup1Pose.getHeading(), pickup1Pose.getHeading(), .8);
 
         pickup1Path = new Path(new BezierLine(pickup1Pose, scorePose));
-        pickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading());
+        pickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading(), .8);
 
         score1Path = new Path(new BezierLine(scorePose, lineup2Pose ));
-        score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading());
+        score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading(), .8);
 
         lineup2Path = new Path(new BezierLine(lineup2Pose, pickup2Pose));
-        lineup2Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading());
+        lineup2Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading(), .8);
 
         pickup2Path = new Path(new BezierLine(pickup2Pose, scorePose));
-        pickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading());
+        pickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading(), .8);
 
         score2Path = new Path(new BezierLine(scorePose, empty));
-        score2Path.setLinearHeadingInterpolation(scorePose.getHeading(), empty.getHeading());
+        score2Path.setLinearHeadingInterpolation(scorePose.getHeading(), empty.getHeading(), .8);
 
         emptyPath = new Path(new BezierLine(empty, endPose));
-        emptyPath.setLinearHeadingInterpolation(empty.getHeading(), endPose.getHeading());
+        emptyPath.setLinearHeadingInterpolation(empty.getHeading(), endPose.getHeading(), .8);
 
         /*path8 = new Path(new BezierLine(pose8, pose8));
         path8.setLinearHeadingInterpolation(pose8.getHeading(), pose8.getHeading());
