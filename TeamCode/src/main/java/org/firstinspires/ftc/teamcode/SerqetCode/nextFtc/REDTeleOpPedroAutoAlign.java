@@ -6,9 +6,6 @@ import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.geometry.BezierPoint;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
 @TeleOp//(name = "RED Main TeleOp *TEST*", group = "PedroPathing")
 public class REDTeleOpPedroAutoAlign extends LinearOpMode {
@@ -75,6 +73,11 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
     private static double turn;
     private static BezierPoint point;
 
+    // HoldPoint heading controller limits
+    private static final double HOLD_MAX_TURN = 0.45;
+    private static final double HOLD_MIN_TURN_CMD = 0.06;
+    private static final double HOLD_HEADING_DEADBAND_RAD = Math.toRadians(1.0);
+
     // Telemetry values
     public double leftError;
     public double rightError;
@@ -125,14 +128,8 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
        AUTO ALIGN (one-shot tx)
        ========================================================= */
     private boolean alignStarted = false;
-    private Pose holdPose;
-    private Path alignPath;
-
-    private static double wrapDeg(double deg) {
-        while (deg > 180) deg -= 360;
-        while (deg <= -180) deg += 360;
-        return deg;
-    }
+    private BezierPoint holdPoint;
+    private double holdHeadingRad = 0.0;
     @Override
     public void runOpMode() {
 
@@ -252,16 +249,24 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
             smoothedDistanceCm = null;
             shootState = ShootState.ALIGNING;
 
-            // We'll grab tx once in ALIGNING and start a turn path that holds the endpoint.
+            // We'll grab tx once in ALIGNING and then holdPoint + heading through the rest.
             alignStarted = false;
-            holdPose = null;
-            alignPath = null;
+            holdPoint = null;
+            holdHeadingRad = 0.0;
         }
 
         // Always update Limelight result once per loop so other states can safely use it.
         result = limelight.getLatestResult();
         boolean tagValid = result != null && result.isValid()
                 && !result.getFiducialResults().isEmpty();
+
+    // ---- Debug telemetry (keep lightweight; values are safe when tagValid is false) ----
+    telemetry.addData("LL valid", tagValid);
+    telemetry.addData("LL tx (deg)", (result != null) ? result.getTx() : Double.NaN);
+    telemetry.addData("LL ty (deg)", (result != null) ? result.getTy() : Double.NaN);
+    telemetry.addData("Heading (rad)", follower.getHeading());
+    telemetry.addData("Target heading (rad)", offsetHeading);
+    telemetry.addData("Follower busy", follower.isBusy());
 
         if (tagValid) {
             lastTagSeenTimeMs = System.currentTimeMillis();
@@ -284,41 +289,20 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                     break;
                 }
 
-                // Poll tx ONCE, then start a short path that ends with hold=true.
+                // Poll tx ONCE, then lock a hold point + heading target.
                 if (!alignStarted) {
-                    double tx = Math.toRadians(result.getTx() + 2); // your existing offset
+                    double txDeg = result.getTx() + 2; // your existing offset
 
-                    double startHeading = follower.getHeading();
-                    offsetHeading = startHeading + tx;
-
-                    // Hold position is the pose at button press, just with an updated heading.
-                    holdPose = new Pose(
-                            follower.getPose().getX(),
-                            follower.getPose().getY(),
-                            offsetHeading
-                    );
-
-                    // Make a tiny "turn" path (very small translation) so Pedro engages path follower,
-                    // and then holds the end pose to fight defense.
-                    Pose startPose = new Pose(
-                            follower.getPose().getX(),
-                            follower.getPose().getY(),
-                            follower.getPose().getHeading()
-                    );
-                    Pose endPose = new Pose(
-                            follower.getPose().getX() + 0.5,
-                            follower.getPose().getY(),
-                            offsetHeading
-                    );
-
-                    alignPath = new Path(new BezierLine(startPose, endPose));
-                    alignPath.setConstantHeadingInterpolation(offsetHeading);
-                    follower.followPath(alignPath, true);
+                    holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
+                    holdHeadingRad = follower.getPose().getHeading() + Math.toRadians(txDeg);
                     alignStarted = true;
                 }
 
-                // Once the follower finishes, it will hold the end pose (because hold=true).
-                if (follower.getHeadingError() < Math.toRadians(1)) {
+                // Use holdPoint controller to turn-in-place while keeping translation locked.
+                updateHoldPoint();
+
+                // Transition once we're reasonably aligned (no need to wrap, per your preference).
+                if (Math.abs(holdHeadingRad - follower.getPose().getHeading()) < HOLD_HEADING_DEADBAND_RAD) {
                     shootState = ShootState.SPINNING_UP;
                 }
 
@@ -330,9 +314,9 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                ===================================================== */
             case SPINNING_UP: {
         // DON'T overwrite Pedro's hold-at-end with teleop commands.
-        // We just let the follower continue holding the end of the ALIGNING path.
         if (!tagValid) break;
-                follower.followPath(alignPath, true);
+
+        updateHoldPoint();
                 double distanceMeters =
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
                                 Math.tan(Math.toRadians(result.getTy()
@@ -370,8 +354,7 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
-                follower.followPath(alignPath, true);
-                // Continue holding end pose autonomously
+                updateHoldPoint();
                 shooter.setFeedPower(-1.0);
                 break;
 
@@ -399,11 +382,41 @@ public class REDTeleOpPedroAutoAlign extends LinearOpMode {
         smoothedDistanceCm = null;
 
         alignStarted = false;
-        holdPose = null;
-        alignPath = null;
+        holdPoint = null;
+        holdHeadingRad = 0.0;
 
         // Restore driver controls
         follower.startTeleOpDrive();
+    }
+
+    /**
+     * Uses your tuned heading controller constants (P term from pedroPathing.Constants)
+     * to compute a turn command, then calls follower.holdPoint(holdPoint, turn).
+     *
+     * Note: per your request, this does NOT angle-wrap the error.
+     */
+    private void updateHoldPoint() {
+        if (holdPoint == null) return;
+
+        double headingError = holdHeadingRad - follower.getPose().getHeading();
+
+        // Use tuned heading controller P from your Pedro follower constants.
+        // (PIDFCoefficients: p, i, d, f)
+        double kp = Constants.followerConstants.headingPIDFCoefficients.p;
+        double turnCmd = kp * headingError;
+
+        if (Math.abs(headingError) < HOLD_HEADING_DEADBAND_RAD) {
+            turnCmd = 0.0;
+        } else {
+            if (Math.abs(turnCmd) < HOLD_MIN_TURN_CMD) {
+                turnCmd = Math.copySign(HOLD_MIN_TURN_CMD, turnCmd);
+            }
+            if (Math.abs(turnCmd) > HOLD_MAX_TURN) {
+                turnCmd = Math.copySign(HOLD_MAX_TURN, turnCmd);
+            }
+        }
+
+        follower.holdPoint(holdPoint, turnCmd);
     }
 
     private void handleLift() {
