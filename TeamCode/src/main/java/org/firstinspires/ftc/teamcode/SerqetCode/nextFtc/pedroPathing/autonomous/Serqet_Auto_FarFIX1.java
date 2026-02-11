@@ -10,18 +10,17 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
 @Autonomous(name = "Serqet Auto Far", group = "Examples")
- public class Serqet_Auto_Far extends OpMode {
+ public class Serqet_Auto_FarFIX1 extends OpMode {
 
     private static final double SHOOT_SECONDS = 4.5;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
@@ -181,7 +180,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
             */
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS + .5) {
+                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS + 1.5) {
 
                 /* Score Preload */
 
@@ -216,7 +215,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
                     setPathState(3);
                 }
             case 3:
-                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS + .5) {
+                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS + 1.5) {
 
                     /*follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(score1Path);*/
@@ -354,20 +353,30 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
     private double shootForTime(double seconds) {
         ElapsedTime timer = new ElapsedTime();
 
-        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds) {
-            follower.update();
-            updateHold();
+        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + 1) {
+           if(timer.seconds() > seconds) {
+               stopShoot();
+           }
+           else {
+               follower.update();
+               updateHold();
 
-            updateDistanceAndShooterTarget();
+               updateDistanceAndShooterTarget();
 
-            shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
-            shooter.update();
+               shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+               shooter.update();
 
-            telemetry.addData("Shooting (s)", timer.seconds());
-            //telemetry.addData("Distance (cm)", targetDistanceCm);
-            telemetry.update();
+               telemetry.addData("Shooting (s)", timer.seconds());
+               //telemetry.addData("Distance (cm)", targetDistanceCm);
+               telemetry.update();
+           }
         }
         return timer.seconds();
+    }
+
+    private void stopShoot() {
+        shooter.setTarget(0, .205);
+        shooter.update();
     }
 
     private void updateDistanceAndShooterTarget() {
