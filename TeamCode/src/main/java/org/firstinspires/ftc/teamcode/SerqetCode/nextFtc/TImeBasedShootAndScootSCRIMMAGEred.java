@@ -1,22 +1,19 @@
-package org.firstinspires.ftc.teamcode.SerqetCode;
+package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
-import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-
 @Disabled
-@Autonomous(name = "Shoot and Scoot Far Blue", preselectTeleOp = "BLUE Main TeleOp")
-public class TImeBasedShootAndScootSCRIMMAGE extends LinearOpMode {
+
+@Autonomous(name = "Shoot and Scoot Far Red", preselectTeleOp = "RED Main TeleOp")
+public class TImeBasedShootAndScootSCRIMMAGEred extends LinearOpMode {
 
     private DcMotorEx frontLeft, frontRight, backLeft, backRight;
     private ShooterSubsystemSCRIMMAGE shooter;

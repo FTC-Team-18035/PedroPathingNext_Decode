@@ -6,7 +6,6 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,9 +15,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Disabled
-@Autonomous(name = "BLUE Auto: Align+Shoot+Drive 12\"", group = "Serqet")
-public class PedroAutoAlign_TEMPLATE extends LinearOpMode {
+@Autonomous(name = "Red Auto: Align+Shoot+Drive 12\"", group = "Serqet", preselectTeleOp = "RED Main TeleOp")
+public class RED_AutoAlignShootDrive12 extends LinearOpMode {
     private DcMotorEx frontRight, frontLeft, backRight, backLeft;
 
     /* =========================================================
@@ -54,7 +52,7 @@ public class PedroAutoAlign_TEMPLATE extends LinearOpMode {
     private static final double ALIGN_TIMEOUT_SECONDS = 3.0;
 
     // Blue-side horizontal offset used in BLUEMainTeleOpWORKING
-    private static final double TX_OFFSET_DEG = -2.0;
+    private static final double BLUE_TX_OFFSET_DEG = -2.0;
 
     /* =========================================================
        SHOOTER FILTERING / SAFETIES
@@ -100,13 +98,13 @@ public class PedroAutoAlign_TEMPLATE extends LinearOpMode {
         shooter = new ShooterSubsystemSCRIMMAGE(hardwareMap);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); //TODO Change this depending on what color you're doing. It's set for blue by default
+        limelight.pipelineSwitch(8); // matches REDMainTeleOpWORKING
         limelight.start();
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(0, 0, 0));
 
-        telemetry.addLine("Auto ready: align -> shoot -> drive 12\"");
+        telemetry.addLine("BLUE Auto ready: align -> shoot -> drive 12\"");
         telemetry.update();
 
         waitForStart();
@@ -169,7 +167,7 @@ public class PedroAutoAlign_TEMPLATE extends LinearOpMode {
                 continue;
             }
 
-            double tx = result.getTx() + TX_OFFSET_DEG;
+            double tx = result.getTx() + BLUE_TX_OFFSET_DEG;
             double absError = Math.abs(tx);
 
             if (absError < bestHeadingErrorDeg - ALIGN_MIN_IMPROVEMENT) {
@@ -211,7 +209,7 @@ public class PedroAutoAlign_TEMPLATE extends LinearOpMode {
 
             updateDistanceAndShooterTarget();
 
-            shooter.setFeedPower(-1.0);
+            shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
             shooter.update();
 
             telemetry.addData("Shooting (s)", timer.seconds());

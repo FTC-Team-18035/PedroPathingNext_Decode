@@ -17,6 +17,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
+@Disabled
 @Autonomous(name = "BLUE Auto Far Setup", group = "Examples")
 public class BLUE_Auto_Far extends OpMode {
 
@@ -96,10 +98,10 @@ public class BLUE_Auto_Far extends OpMode {
     private final Pose startPose = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(53.6, 13, Math.toRadians(108)); // y(11.1) Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose scorePoseNear = new Pose(72,72, Math.toRadians(135));  // alternate scoring Pose at field center
-    private final Pose pickup1Pose = new Pose(14, 36, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup1Pose = new Pose(14, 45, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose pickup2Pose = new Pose(14.5,60, Math.toRadians(180));
     private final Pose Pickup3Pose = new Pose(14.5,84, Math.toRadians(180));
-    private final Pose lineup1Pose = new Pose(41, 36, Math.toRadians(180));
+    private final Pose lineup1Pose = new Pose(41, 45, Math.toRadians(180));
     private final Pose lineup2Pose = new Pose(41.9,60,Math.toRadians(180));
     private final Pose lineup3Pose = new Pose(41.9,84,Math.toRadians(180));
     private final Pose empty = new Pose(16.2,69.8,Math.toRadians(180));
@@ -357,7 +359,8 @@ public class BLUE_Auto_Far extends OpMode {
 
             while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + 1) {
                 if(timer.seconds() > seconds) {
-                    stopShoot();
+                    shooter.stop();
+                   // stopShoot();
                 }
                 else {
                     follower.update();

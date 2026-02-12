@@ -10,6 +10,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -20,7 +21,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "Serqet Auto Far Red", group = "Examples")
+@Disabled
+@Autonomous(name = "Serqet Auto Far Red", group = "Examples", preselectTeleOp = "RED Main TeleOp")
 public class Serqet_Auto_Far_Red extends OpMode {
 
     private static final double SHOOT_SECONDS = 4.5;           // TODO: Change this if isn't enough time or too much...6 was too much

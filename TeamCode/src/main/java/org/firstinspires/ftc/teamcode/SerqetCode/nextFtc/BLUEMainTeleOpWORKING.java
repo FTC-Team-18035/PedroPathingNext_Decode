@@ -253,7 +253,7 @@ public class BLUEMainTeleOpWORKING extends LinearOpMode {
                 }
 
                 // Horizontal offset from Limelight (degrees)
-                double tx = result.getTx() + 2;
+                double tx = result.getTx();
                 double absError = Math.abs(tx);
 
                 /* ----- Track whether we're still improving ----- */

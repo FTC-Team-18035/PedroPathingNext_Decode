@@ -163,20 +163,18 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
             updateHoldPoint();
             return;
         }
-
-        double scalar = gamepad1.left_trigger > 0.5 ? 1.0 : 0.5;
-
-        if (gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
-            heading = follower.getHeading();
+        else if (shootState == ShootState.IDLE) {
+            if (gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
+                heading = follower.getHeading();
+            }
+            follower.setTeleOpDrive(
+                    gamepad1.left_stick_y,
+                    gamepad1.left_stick_x,
+                    gamepad1.right_stick_x,
+                    false,
+                    heading
+            );
         }
-
-        follower.setTeleOpDrive(
-                scalar * gamepad1.left_stick_y,
-                scalar * gamepad1.left_stick_x,
-                scalar * gamepad1.right_stick_x,
-                false,
-                heading
-        );
     }
 
     /* =========================================================
@@ -210,14 +208,14 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
 
         /* -------- Start shooting sequence -------- */
         if (gamepad1.a && shootState == ShootState.IDLE) {
-            shootState = ShootState.ALIGNING;
-
             // Initialize hold targets from current pose
             holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
             holdHeadingRad = follower.getPose().getHeading();
             alignTxCaptured = false;
 
             smoothedDistanceCm = null;
+
+            shootState = ShootState.ALIGNING;
         }
 
         if (shootState == ShootState.IDLE) return;
@@ -252,11 +250,7 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
                     holdHeadingRad = follower.getPose().getHeading() + Math.toRadians(txDeg);
                     alignTxCaptured = true;
                 }
-
-                // Drivetrain command is done via holdPoint() inside handleDrive().
-                // Transition once we’re inside the deadband.
-                double headingError = angleWrapRad(holdHeadingRad - follower.getPose().getHeading());
-                if (Math.abs(headingError) < HOLD_HEADING_DEADBAND_RAD) {
+                if (alignTxCaptured) {
                     shootState = ShootState.SPINNING_UP;
                 }
 
@@ -308,8 +302,6 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
             holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
         }
 
-        // Pedro API in this repo expects the second argument to be the heading (rad) to hold,
-        // not a turn power command.
         follower.holdPoint(holdPoint, holdHeadingRad);
     }
 

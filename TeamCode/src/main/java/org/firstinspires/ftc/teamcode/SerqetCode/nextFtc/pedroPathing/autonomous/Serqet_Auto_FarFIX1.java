@@ -10,6 +10,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -19,7 +20,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "Serqet Auto Far", group = "Examples")
+@Disabled
+@Autonomous(name = "Serqet Auto Far Blue", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
  public class Serqet_Auto_FarFIX1 extends OpMode {
 
     private static final double SHOOT_SECONDS = 4.5;           // TODO: Change this if isn't enough time or too much...6 was too much
@@ -97,7 +99,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
     private final Pose lineup1Pose = new Pose(41, 44.8, Math.toRadians(180));
     private final Pose lineup2Pose = new Pose(41.9,59,Math.toRadians(180));
     private final Pose empty = new Pose(16.2,69.8,Math.toRadians(180));
-    private final Pose endPose = new Pose(28, 69.7, Math.toRadians(0));
+    private final Pose endPose = new Pose(53.6, 20, Math.toRadians(0));
 
 
     private Path scorePreload;
@@ -142,6 +144,9 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
         emptyPath = new Path(new BezierLine(empty, endPose));
         emptyPath.setLinearHeadingInterpolation(empty.getHeading(), endPose.getHeading(), .8);
 
+        endPath = new Path(new BezierLine(scorePose, endPose));
+        endPath.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading(), .8);
+
         /*path8 = new Path(new BezierLine(pose8, pose8));
         path8.setLinearHeadingInterpolation(pose8.getHeading(), pose8.getHeading());
 
@@ -180,7 +185,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
             */
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS + 1.5) {
+                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS) {
 
                 /* Score Preload */
 
@@ -215,11 +220,11 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
                     setPathState(3);
                 }
             case 3:
-                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS + 1.5) {
+                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS) {
 
                     /*follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(score1Path);*/
-                    setPathState(-1);
+                    setPathState(4);
                 }
                 break;
             case 4:
@@ -227,8 +232,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
             {
 
                 //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
-                    follower.followPath(lineup2Path);
-                    setPathState(5);
+                    follower.followPath(endPath);
+                    setPathState(-1);
                 }
             //}
             break;
@@ -355,7 +360,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
         while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + 1) {
            if(timer.seconds() > seconds) {
-               stopShoot();
+               shooter.stop();
+               //stopShoot();
            }
            else {
                follower.update();
@@ -376,6 +382,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
     private void stopShoot() {
         shooter.setTarget(0, .205);
+        shooter.setFeedPower(0);
         shooter.update();
     }
 

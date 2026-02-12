@@ -92,6 +92,7 @@ public class ShooterSubsystemSCRIMMAGE {
         rightShooter.setPower(0.0);
         leftController.reset();
         rightController.reset();
+        setFeedPower(0);
     }
     public void setFeedPower(double power) {
         vaultFeed.setPower(-power);
