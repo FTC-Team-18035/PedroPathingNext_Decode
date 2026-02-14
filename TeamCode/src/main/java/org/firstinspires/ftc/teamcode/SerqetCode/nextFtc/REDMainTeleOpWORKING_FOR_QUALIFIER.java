@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "BLUE Main TeleOp LIFT CHANGE", group = "PedroPathing")
-public class BLUEMainTeleOpWORKING extends LinearOpMode {
+@TeleOp(name = "RED Main TeleOp", group = "PedroPathing")
+public class REDMainTeleOpWORKING_FOR_QUALIFIER extends LinearOpMode {
 
     /* =========================================================
        LIMELIGHT GEOMETRY CONSTANTS
@@ -122,10 +122,10 @@ public class BLUEMainTeleOpWORKING extends LinearOpMode {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setTargetPosition(0);
-        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); // AprilTag pipeline
+        limelight.pipelineSwitch(8); // AprilTag pipeline
         limelight.start();
 
         /* ---------------- Drive / Localization Setup ---------------- */
@@ -253,7 +253,7 @@ public class BLUEMainTeleOpWORKING extends LinearOpMode {
                 }
 
                 // Horizontal offset from Limelight (degrees)
-                double tx = result.getTx();
+                double tx = result.getTx() + 2;
                 double absError = Math.abs(tx);
 
                 /* ----- Track whether we're still improving ----- */
@@ -354,11 +354,9 @@ public class BLUEMainTeleOpWORKING extends LinearOpMode {
     }
 
     private void handleLift() {
-        if(gamepad1.dpad_up && gamepad1.left_trigger > .75 && lift.getCurrentPosition() < 3600) {    //TODO Changed it so you have to be holding the left trigger to run the lift
+        if(gamepad1.dpad_up && gamepad1.left_trigger > .75) {    //TODO Changed it so you have to be holding the left trigger to run the lift
+            lift.setTargetPosition(3600);
             lift.setPower(1);
-        }
-        else {
-            lift.setPower(0);
         }
     }
 }

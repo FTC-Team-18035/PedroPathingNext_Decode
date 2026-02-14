@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@TeleOp(name = "RED Main TeleOp", group = "PedroPathing")
+@TeleOp(name = "RED Main TeleOp LIFT CHANGE", group = "PedroPathing")
 public class REDMainTeleOpWORKING extends LinearOpMode {
 
     /* =========================================================
