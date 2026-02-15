@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Disabled
 @Autonomous(name = "Serqet Auto Far Red", group = "Examples", preselectTeleOp = "RED Main TeleOp")
 public class Serqet_Auto_Far_Red extends OpMode {
 

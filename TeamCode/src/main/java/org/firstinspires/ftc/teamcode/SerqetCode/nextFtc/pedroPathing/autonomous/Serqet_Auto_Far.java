@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
 @Disabled
-@Autonomous(name = "Serqet Auto Far", group = "Examples")
+@Autonomous(name = "Serqet Auto Far Blue", group = "Examples")
  public class Serqet_Auto_Far extends OpMode {
 
     private static final double SHOOT_SECONDS = 4.5;           // TODO: Change this if isn't enough time or too much...6 was too much

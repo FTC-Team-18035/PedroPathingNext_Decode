@@ -20,15 +20,14 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Disabled
 @Autonomous(name = "Serqet Auto Far Blue", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
  public class Serqet_Auto_FarFIX1 extends OpMode {
 
-    private static final double SHOOT_SECONDS = 4.5;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
-    private static final double MAX_DRIVE_SPEED = .5; // Change this for the max speed
-    private static final double MAX_INTAKE_SPEED = .3; // Change this if we need to intake slower
+    private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
+    private static final double MAX_INTAKE_SPEED = .35; // Change this if we need to intake slower
     private static final double DRIVE_POWER = 0.7;
     private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
 
@@ -94,10 +93,11 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
     private final Pose startPose = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(53.6, 13/*11.1*/, Math.toRadians(108)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose score2Pose = new Pose(60, 90, Math.toRadians(135));
     private final Pose pickup1Pose = new Pose(14, 44.8, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(14.5,58.6, Math.toRadians(180));
+    private final Pose pickup2Pose = new Pose(14,69, Math.toRadians(180));
     private final Pose lineup1Pose = new Pose(41, 44.8, Math.toRadians(180));
-    private final Pose lineup2Pose = new Pose(41.9,59,Math.toRadians(180));
+    private final Pose lineup2Pose = new Pose(41.9,69,Math.toRadians(180));
     private final Pose empty = new Pose(16.2,69.8,Math.toRadians(180));
     private final Pose endPose = new Pose(53.6, 20, Math.toRadians(0));
 
@@ -135,11 +135,11 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
         lineup2Path = new Path(new BezierLine(lineup2Pose, pickup2Pose));
         lineup2Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading(), .8);
 
-        pickup2Path = new Path(new BezierLine(pickup2Pose, scorePose));
-        pickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading(), .8);
+        pickup2Path = new Path(new BezierLine(pickup2Pose, score2Pose));
+        pickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), score2Pose.getHeading(), .8);
 
-        score2Path = new Path(new BezierLine(scorePose, empty));
-        score2Path.setLinearHeadingInterpolation(scorePose.getHeading(), empty.getHeading(), .8);
+        score2Path = new Path(new BezierLine(score2Pose, empty));
+        score2Path.setLinearHeadingInterpolation(score2Pose.getHeading(), empty.getHeading(), .8);
 
         emptyPath = new Path(new BezierLine(empty, endPose));
         emptyPath.setLinearHeadingInterpolation(empty.getHeading(), endPose.getHeading(), .8);
@@ -173,9 +173,9 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
                     //shooter.setFeedPower(-1);
                     //shooter.setTarget(1180, 20);
                     shootForTime(SHOOT_SECONDS);
-                    actionTimer.resetTimer();
                     setPathState(1);
                 }
+                break;
             case 1:
 
             /* You could check for
@@ -185,7 +185,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
             */
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS) {
+                if (!follower.isBusy()) {
 
                 /* Score Preload */
 
@@ -199,31 +199,42 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
             case 1_5:
                 if (!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-1);
+                    shooter.setFeedPower(-.5);
+                    follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
+                    pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!follower.isBusy()) {
-                    intake.setPower(0);
+                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                    intake.setPower(1);
                     shooter.setFeedPower(0);
-                   // follower.setMaxPower(MAX_INTAKE_SPEED);
+                }
+                if (!follower.isBusy()) {
+                   intake.setPower(0);
+                   shooter.setFeedPower(0);
+
+                    follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
+                    //actionTimer.resetTimer();
                     setPathState(2_5);
                 }
                 break;
             case 2_5:
+               // if(actionTimer.getElapsedTimeSeconds() > 1) {
+               //     shooter.setFeedPower(0);
+               //     intake.setPower(0);
+               // }
                 if(!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
-                    actionTimer.resetTimer();
                     setPathState(3);
                 }
+                break;
             case 3:
-                if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > SHOOT_SECONDS) {
+                if (!follower.isBusy()) {
 
-                    /*follower.setMaxPower(MAX_DRIVE_SPEED);
-                    follower.followPath(score1Path);*/
+                    follower.followPath(score1Path);
                     setPathState(4);
                 }
                 break;
@@ -232,27 +243,46 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
             {
 
                 //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
-                    follower.followPath(endPath);
-                    setPathState(-1);
+                    intake.setPower(1);
+                    shooter.setFeedPower(-.5);
+                    follower.setMaxPower(MAX_INTAKE_SPEED);
+                    follower.followPath(lineup2Path);
+                    pathTimer.resetTimer();
+                    setPathState(5);
                 }
             //}
             break;
             case 5:
+                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                    intake.setPower(1);
+                    shooter.setFeedPower(0);
+                }
+
                 if (!follower.isBusy())
             {
-                intake.setPower(1);
-                shooter.setFeedPower(-1);
-                //follower.setMaxPower(MAX_INTAKE_SPEED);
+                intake.setPower(0);
+                shooter.setFeedPower(0);
+
+                follower.setMaxPower(MAX_DRIVE_SPEED);
+               // actionTimer.resetTimer();
                 follower.followPath(pickup2Path);
-                setPathState(6);
+                setPathState(5_5);
             }
+            break;
+            case 5_5:
+               // if(actionTimer.getElapsedTimeSeconds() > 1) {
+                 //   shooter.setFeedPower(0);
+                   // intake.setPower(0);
+                //}
+                if(!follower.isBusy()) {
+                    shootForTime(SHOOT_SECONDS);
+                    setPathState(-1);
+                }
             break;
             case 6:
                 if (!follower.isBusy())
             {
                 intake.setPower(0);
-                shooter.setFeedPower(0);
-                follower.setMaxPower(MAX_DRIVE_SPEED);
                 follower.followPath(score2Path);
                 setPathState(7);
             }
@@ -364,6 +394,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
                //stopShoot();
            }
            else {
+               //intake.setPower(1);
                follower.update();
                updateHold();
 

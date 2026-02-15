@@ -15,6 +15,7 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.driving.DriverControlledCommand;
 import dev.nextftc.hardware.impl.MotorEx;
+@Disabled
 @TeleOp(name = "Field Centric Pedro Johnny")
 public class Attempt1NextFtcTeleOpPedroFieldCentricJD extends NextFTCOpMode {
     public Attempt1NextFtcTeleOpPedroFieldCentricJD() {

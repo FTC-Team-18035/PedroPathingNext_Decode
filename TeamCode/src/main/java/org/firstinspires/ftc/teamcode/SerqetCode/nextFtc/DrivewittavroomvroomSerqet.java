@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems.theclaw;
@@ -13,6 +14,7 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.MotorEx;
 
+@Disabled
 @TeleOp(name = "Drive Witta Vroom Vroom Serqet")
 public class DrivewittavroomvroomSerqet extends NextFTCOpMode {
     // Jasper //

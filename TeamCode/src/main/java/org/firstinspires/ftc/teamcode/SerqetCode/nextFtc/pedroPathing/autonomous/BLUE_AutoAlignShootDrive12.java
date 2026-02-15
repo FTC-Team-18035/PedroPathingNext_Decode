@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "BLUE Auto: Align+Shoot+Drive 12\"", group = "Serqet", preselectTeleOp = "BLUE Main TeleOP")
+@Autonomous(name = "BLUE Auto: Align+Shoot+Drive 12\"", group = "Serqet", preselectTeleOp = "BLUE Main TeleOp")
 public class BLUE_AutoAlignShootDrive12 extends LinearOpMode {
     private DcMotorEx frontRight, frontLeft, backRight, backLeft;
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.JD_Code.limelight.nextFTC.subsytems.theclaw;
@@ -15,6 +16,7 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.driving.DriverControlledCommand;
 import dev.nextftc.hardware.impl.MotorEx;
 
+@Disabled
 @TeleOp(name = "Field Centric Pedro Serqet")
 public class Attempt1NextFtcTeleOpPedroFieldCentricSerqet extends NextFTCOpMode {
     public Attempt1NextFtcTeleOpPedroFieldCentricSerqet() {

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import static dev.nextftc.bindings.Bindings.button;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.Drivetrain;
 
 import dev.nextftc.bindings.BindingManager;
@@ -16,6 +18,7 @@ import dev.nextftc.hardware.driving.DriverControlledCommand;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.MotorEx;
 
+@Disabled
 public class DrivetrainSwapTest extends NextFTCOpMode {
 
     public DrivetrainSwapTest() {

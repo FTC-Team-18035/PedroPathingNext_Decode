@@ -8,6 +8,7 @@ import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.geometry.BezierPoint;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
+@Disabled
 @TeleOp
 public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
 
@@ -96,6 +98,8 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
     // We only read tx ONCE in ALIGNING and convert it to a new heading setpoint.
     private boolean alignTxCaptured = false;
 
+    private boolean holdInit = false;
+
     @Override
     public void runOpMode() {
 
@@ -110,7 +114,7 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setTargetPosition(0);
-        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(8); // AprilTag pipeline
@@ -252,6 +256,7 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
                 }
                 if (alignTxCaptured) {
                     shootState = ShootState.SPINNING_UP;
+                    follower.holdPoint(holdPoint, holdHeadingRad);
                 }
 
                 break;
@@ -325,9 +330,11 @@ public class REDMainTeleOp_TESTHoldPoint extends LinearOpMode {
        LIFT
        ========================================================= */
     private void handleLift() {
-        if (gamepad1.dpad_up && gamepad1.left_trigger > .75) {
-            lift.setTargetPosition(3600);
+        if (gamepad1.dpad_up && gamepad1.left_trigger > .75 && lift.getCurrentPosition() < 3600) {
             lift.setPower(1);
+        }
+        else{
+            lift.setPower(0);
         }
     }
 
