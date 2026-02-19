@@ -92,12 +92,14 @@ public class Serqet_Auto_Far_Red extends OpMode {
 
     private final Pose startPose = new Pose(88, 8, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(87, 13/*11.1*/, Math.toRadians(68)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose score2Pose = new Pose(84, 90, Math.toRadians(45));
-    private final Pose pickup1Pose = new Pose(130, 44.8, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(130,69, Math.toRadians(0));
-    private final Pose lineup1Pose = new Pose(103, 44.8, Math.toRadians(0));
-    private final Pose lineup2Pose = new Pose(102,69,Math.toRadians(0));
-    private final Pose empty = new Pose(16.2,69.8,Math.toRadians(0));
+    private final Pose score2Pose = new Pose(84, 80, Math.toRadians(45));
+    private final Pose pickup1Pose = new Pose(115, 28, Math.toRadians(0)); // x107 // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup2Pose = new Pose(115, 53, Math.toRadians(0));  // y55
+    private final Pose pickup3Pose = new Pose(115, 75, Math.toRadians(0));
+    private final Pose lineup1Pose = new Pose(95, 28, Math.toRadians(0));
+    private final Pose lineup2Pose = new Pose(95, 53,Math.toRadians(0));  // y55
+    private final Pose lineup3Pose = new Pose(95, 75, Math.toRadians(0));
+    private final Pose empty = new Pose(16.2,59.8,Math.toRadians(0));
     private final Pose endPose = new Pose(53.6, 20, Math.toRadians(180));
 
 
@@ -107,8 +109,10 @@ public class Serqet_Auto_Far_Red extends OpMode {
     private Path readyPath;
     private Path lineup1Path;
     private Path lineup2Path;
+    private Path lineup3Path;
     private Path pickup1Path;
     private Path pickup2Path;
+    private Path pickup3Path;
     private Path emptyPath;
     private Path endPath;
     private Path path8;
@@ -145,6 +149,12 @@ public class Serqet_Auto_Far_Red extends OpMode {
 
         endPath = new Path(new BezierLine(scorePose, endPose));
         endPath.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading(), .8);
+
+        lineup3Path = new Path(new BezierLine(score2Pose, lineup3Pose));
+        lineup3Path.setLinearHeadingInterpolation(score2Pose.getHeading(), lineup3Pose.getHeading(), .8);
+
+        pickup3Path = new Path(new BezierLine(lineup3Pose, pickup3Pose));
+        pickup3Path.setLinearHeadingInterpolation(lineup3Pose.getHeading(), pickup3Pose.getHeading(), .8);
 
         /*path8 = new Path(new BezierLine(pose8, pose8));
         path8.setLinearHeadingInterpolation(pose8.getHeading(), pose8.getHeading());
@@ -206,7 +216,7 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                if(pathTimer.getElapsedTimeSeconds() > 1.25) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
                 }
@@ -252,7 +262,7 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 //}
                 break;
             case 5:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                if(pathTimer.getElapsedTimeSeconds() > 1.25) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
                 }
@@ -275,27 +285,33 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 //}
                 if(!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
-                    setPathState(-1);
+                    setPathState(6);
                 }
                 break;
             case 6:
                 if (!follower.isBusy())
                 {
-                    intake.setPower(0);
-                    follower.followPath(score2Path);
+
+                    //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
+                    follower.followPath(lineup3Path);
                     setPathState(7);
                 }
+                //}
                 break;
             case 7:
                 if (!follower.isBusy()) {
-                    if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
-                        follower.followPath(emptyPath);
-                        setPathState(-1);
-                    }
-                }
-                break;
+                    intake.setPower(1);
+                    shooter.setFeedPower(-.5);
+                    follower.setMaxPower(MAX_INTAKE_SPEED);
+                    follower.followPath(pickup3Path);
+                    pathTimer.resetTimer();
+                    setPathState(-1);
+            }
+            break;
             case -1:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.25) {
+                    intake.setPower(0);
+                    shooter.setFeedPower(0);
                     requestOpModeStop();
                 }
 

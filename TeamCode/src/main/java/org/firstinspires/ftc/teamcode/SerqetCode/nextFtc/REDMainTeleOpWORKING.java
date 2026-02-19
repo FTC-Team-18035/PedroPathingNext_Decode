@@ -108,6 +108,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
     private long lastTagSeenTimeMs = 0;
     private double heading = 0;
 
+    public double scalar;
     @Override
     public void runOpMode() {
 
@@ -168,7 +169,12 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
         // Disable manual driving during shooting sequence
         if (shootState != ShootState.IDLE) return;
 
-        double scalar = gamepad1.left_trigger > 0.5 ? 1.0 : 0.5;
+        if (gamepad1.left_trigger > .5){
+            scalar = 1;
+        }
+        else if (gamepad1.left_trigger < .5) {
+            scalar = .5;
+        }
 
         if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
             heading = follower.getHeading();

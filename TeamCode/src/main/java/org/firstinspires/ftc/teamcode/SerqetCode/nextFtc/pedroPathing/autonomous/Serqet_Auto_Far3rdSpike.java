@@ -300,10 +300,12 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
                 break;
             case 7:
                 if (!follower.isBusy()) {
+                    intake.setPower(1);
+                    shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(pickup3Path);
                     pathTimer.resetTimer();
-                    setPathState(8);
+                    setPathState(-1);
             }
             break;
             case -1:
