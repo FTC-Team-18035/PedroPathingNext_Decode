@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "Serqet Auto Far Red", group = "Examples", preselectTeleOp = "RED Main TeleOp")
-public class Serqet_Auto_Far_Red extends OpMode {
+@Autonomous(name = "Far Blue 3rd Spike", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
+ public class Serqet_Auto_Far_Blue_3rdSpike extends OpMode {
 
     private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
@@ -90,17 +90,17 @@ public class Serqet_Auto_Far_Red extends OpMode {
 
     private int pathState;
 
-    private final Pose startPose = new Pose(88, 8, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(87, 13/*11.1*/, Math.toRadians(68)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose score2Pose = new Pose(84, 80, Math.toRadians(45));
-    private final Pose pickup1Pose = new Pose(115, 28, Math.toRadians(0)); // x107 // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(115, 53, Math.toRadians(0));  // y55
-    private final Pose pickup3Pose = new Pose(115, 75, Math.toRadians(0));
-    private final Pose lineup1Pose = new Pose(95, 28, Math.toRadians(0));
-    private final Pose lineup2Pose = new Pose(95, 53,Math.toRadians(0));  // y55
-    private final Pose lineup3Pose = new Pose(95, 75, Math.toRadians(0));
-    private final Pose empty = new Pose(16.2,59.8,Math.toRadians(0));
-    private final Pose endPose = new Pose(53.6, 20, Math.toRadians(180));
+    private final Pose startPose = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(53.6, 13/*11.1*/, Math.toRadians(108)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose score2Pose = new Pose(60, 90, Math.toRadians(135));
+    private final Pose pickup1Pose = new Pose(14, 44.8, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup2Pose = new Pose(14,69, Math.toRadians(180));
+    private final Pose pickup3Pose = new Pose(16, 93.5, Math.toRadians(180));
+    private final Pose lineup1Pose = new Pose(41, 44.8, Math.toRadians(180));
+    private final Pose lineup2Pose = new Pose(41.9,69,Math.toRadians(180));
+    private final Pose lineup3Pose = new Pose(41, 93.5, Math.toRadians(180));
+    private final Pose empty = new Pose(16.2,69.8,Math.toRadians(180));
+    private final Pose endPose = new Pose(53.6, 20, Math.toRadians(0));
 
 
     private Path scorePreload;
@@ -196,14 +196,14 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if (!follower.isBusy()) {
 
-                    /* Score Preload */
+                /* Score Preload */
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(readyPath);
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                follower.followPath(readyPath);
 
-                    setPathState(1_5);
-                }
-                break;
+                setPathState(1_5);
+            }
+            break;
 
             case 1_5:
                 if (!follower.isBusy()) {
@@ -216,13 +216,13 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 1.25) {
+                if(pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
                 }
                 if (!follower.isBusy()) {
-                    intake.setPower(0);
-                    shooter.setFeedPower(0);
+                   intake.setPower(0);
+                   shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -231,10 +231,10 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 }
                 break;
             case 2_5:
-                // if(actionTimer.getElapsedTimeSeconds() > 1) {
-                //     shooter.setFeedPower(0);
-                //     intake.setPower(0);
-                // }
+               // if(actionTimer.getElapsedTimeSeconds() > 1) {
+               //     shooter.setFeedPower(0);
+               //     intake.setPower(0);
+               // }
                 if(!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
                     setPathState(3);
@@ -249,9 +249,9 @@ public class Serqet_Auto_Far_Red extends OpMode {
                 break;
             case 4:
                 if (!follower.isBusy())
-                {
+            {
 
-                    //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
+                //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
                     intake.setPower(1);
                     shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
@@ -259,35 +259,35 @@ public class Serqet_Auto_Far_Red extends OpMode {
                     pathTimer.resetTimer();
                     setPathState(5);
                 }
-                //}
-                break;
+            //}
+            break;
             case 5:
-                if(pathTimer.getElapsedTimeSeconds() > 1.25) {
+                if(pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
                 }
 
                 if (!follower.isBusy())
-                {
-                    intake.setPower(0);
-                    shooter.setFeedPower(0);
+            {
+                intake.setPower(0);
+                shooter.setFeedPower(0);
 
-                    follower.setMaxPower(MAX_DRIVE_SPEED);
-                    // actionTimer.resetTimer();
-                    follower.followPath(pickup2Path);
-                    setPathState(5_5);
-                }
-                break;
+                follower.setMaxPower(MAX_DRIVE_SPEED);
+               // actionTimer.resetTimer();
+                follower.followPath(pickup2Path);
+                setPathState(5_5);
+            }
+            break;
             case 5_5:
-                // if(actionTimer.getElapsedTimeSeconds() > 1) {
-                //   shooter.setFeedPower(0);
-                // intake.setPower(0);
+               // if(actionTimer.getElapsedTimeSeconds() > 1) {
+                 //   shooter.setFeedPower(0);
+                   // intake.setPower(0);
                 //}
                 if(!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
                     setPathState(6);
                 }
-                break;
+            break;
             case 6:
                 if (!follower.isBusy())
                 {
@@ -309,7 +309,7 @@ public class Serqet_Auto_Far_Red extends OpMode {
             }
             break;
             case -1:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.25) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(0);
                     shooter.setFeedPower(0);
                     requestOpModeStop();
@@ -367,7 +367,7 @@ public class Serqet_Auto_Far_Red extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(8); // matches REDMainTeleOpWORKING
+        limelight.pipelineSwitch(6); // matches BLUEMainTeleOpWORKING
         limelight.start();
 
         buildPaths();
@@ -403,25 +403,25 @@ public class Serqet_Auto_Far_Red extends OpMode {
     private double shootForTime(double seconds) {
         ElapsedTime timer = new ElapsedTime();
 
-        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + 1) {
-            if(timer.seconds() > seconds) {
-                shooter.stop();
-                //stopShoot();
-            }
-            else {
-                //intake.setPower(1);
-                follower.update();
-                updateHold();
+        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
+           if(timer.seconds() > seconds) {
+               shooter.stop();
+               //stopShoot();
+           }
+           else {
+               //intake.setPower(1);
+               follower.update();
+               updateHold();
 
-                updateDistanceAndShooterTarget();
+               updateDistanceAndShooterTarget();
 
-                shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
-                shooter.update();
+               shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+               shooter.update();
 
-                telemetry.addData("Shooting (s)", timer.seconds());
-                //telemetry.addData("Distance (cm)", targetDistanceCm);
-                telemetry.update();
-            }
+               telemetry.addData("Shooting (s)", timer.seconds());
+               //telemetry.addData("Distance (cm)", targetDistanceCm);
+               telemetry.update();
+           }
         }
         return timer.seconds();
     }
@@ -482,7 +482,7 @@ public class Serqet_Auto_Far_Red extends OpMode {
             turn = clamp(turn, -HOLD_MAX_TURN, HOLD_MAX_TURN);
         }
 
-        // follower.holdPoint(holdPoint, turn);
+       // follower.holdPoint(holdPoint, turn);
     }
 
     private static double clamp(double value, double min, double max) {

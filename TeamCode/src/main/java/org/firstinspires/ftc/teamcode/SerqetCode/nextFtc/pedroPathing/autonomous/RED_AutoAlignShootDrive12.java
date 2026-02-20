@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "Red Auto: Align+Shoot+Drive 12\"", group = "Serqet", preselectTeleOp = "RED Main TeleOp")
+@Autonomous(name = "Far Red Preload Delivery", group = "Serqet", preselectTeleOp = "RED Main TeleOp")
 public class RED_AutoAlignShootDrive12 extends LinearOpMode {
     private DcMotorEx frontRight, frontLeft, backRight, backLeft;
 
