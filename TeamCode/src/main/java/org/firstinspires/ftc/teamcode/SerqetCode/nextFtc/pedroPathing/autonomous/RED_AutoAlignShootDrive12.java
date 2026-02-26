@@ -6,6 +6,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -29,7 +30,7 @@ public class RED_AutoAlignShootDrive12 extends LinearOpMode {
     private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
 
     // Optional start delay so you can avoid alliance partners.
-    private static final double START_DELAY_SECONDS = 0; //TODO: add delay if need to wait for alliance partner to complete tasks
+    private static final double START_DELAY_SECONDS = 24; //TODO: add delay if need to wait for alliance partner to complete tasks
 
     // If robot drives the wrong direction, flip this between -1 and +1.
     private static final double FORWARD_SIGN = 1.0;

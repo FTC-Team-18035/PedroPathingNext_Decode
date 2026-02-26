@@ -5,12 +5,10 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -20,8 +18,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Autonomous(name = "Far Red Pickup 3rd Spike", group = "Examples", preselectTeleOp = "RED Main TeleOp")
-public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
+@Autonomous(name = "Close Blue 15 Artifacts", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
+ public class Close_Auto_Blue_15Artifact extends OpMode {
 
     private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
@@ -91,84 +89,41 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
 
     private int pathState;
 
-    private final Pose startPose = new Pose(88, 8, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(87, 13/*11.1*/, Math.toRadians(68)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose score2Pose = new Pose(84, 80, Math.toRadians(45));
-    private final Pose pickup1Pose = new Pose(115, 28, Math.toRadians(0)); // x107 // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(115, 53, Math.toRadians(0));  // y55
-    private final Pose pickup3Pose = new Pose(115, 75, Math.toRadians(0));
-    private final Pose lineup1Pose = new Pose(95, 28, Math.toRadians(0));
-    private final Pose lineup2Pose = new Pose(95, 53,Math.toRadians(0));  // y55
-    private final Pose lineup3Pose = new Pose(95, 75, Math.toRadians(0));
-    private final Pose empty = new Pose(16.2,59.8,Math.toRadians(0));
-    private final Pose endPose = new Pose(53.6, 20, Math.toRadians(180));
-
-
+    private final Pose startPose = new Pose(56, 136, Math.toRadians(270)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(55, 89/*11.1*/, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose lineup2Pose = new Pose(41.9, 60, Math.toRadians(180));
+    private final Pose pickup2Pose = new Pose(21, 60, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose gatePose = new Pose(11.3, 61, Math.toRadians(140)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose score2Pose = new Pose(62, 82, Math.toRadians(138)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose lineup1Pose = new Pose(41, 83.5, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup1Pose = new Pose(20, 83.5, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose lineup3Pose = new Pose(41, 35, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup3Pose = new Pose(20, 35, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose score3Pose = new Pose(55, 115, Math.toRadians(148)); // Highest (First Set) of Artifacts from the Spike Mark.
     private Path scorePreload;
     private Path score1Path;
-    private Path score2Path;
     private Path readyPath;
     private Path lineup1Path;
-    private Path lineup2Path;
-    private Path lineup3Path;
     private Path pickup1Path;
-    private Path pickup2Path;
-    private Path pickup3Path;
-    private Path emptyPath;
-    private Path endPath;
-    private Path path8;
-    private PathChain grabPickup1;
+
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading(), .5);
 
-        readyPath = new Path(new BezierLine(scorePose, lineup1Pose));
-        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading(), .8);
+        readyPath = new Path(new BezierLine(scorePose, lineup2Pose));
+        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading(), .8);
 
-        lineup1Path = new Path(new BezierLine(lineup1Pose, pickup1Pose)) ;
-        lineup1Path.setLinearHeadingInterpolation(lineup1Pose.getHeading(), pickup1Pose.getHeading(), .5);
+        lineup1Path = new Path(new BezierLine(lineup2Pose, pickup2Pose)) ;
+        lineup1Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading(), .5);
 
-        pickup1Path = new Path(new BezierLine(pickup1Pose, scorePose));
-        pickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading(), .8);
+        pickup1Path = new Path(new BezierLine(pickup2Pose, scorePose));
+        pickup1Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading(), .8);
 
-        score1Path = new Path(new BezierLine(scorePose, lineup2Pose ));
+        score1Path = new Path(new BezierLine(scorePose, lineup2Pose));
         score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading(), .5);
 
-        lineup2Path = new Path(new BezierLine(lineup2Pose, pickup2Pose));
-        lineup2Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading(), .8);
-
-        pickup2Path = new Path(new BezierLine(pickup2Pose, score2Pose));
-        pickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), score2Pose.getHeading(), .8);
-
-        score2Path = new Path(new BezierLine(score2Pose, empty));
-        score2Path.setLinearHeadingInterpolation(score2Pose.getHeading(), empty.getHeading(), .8);
-
-        emptyPath = new Path(new BezierLine(empty, endPose));
-        emptyPath.setLinearHeadingInterpolation(empty.getHeading(), endPose.getHeading(), .8);
-
-        endPath = new Path(new BezierLine(scorePose, endPose));
-        endPath.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading(), .8);
-
-        lineup3Path = new Path(new BezierLine(score2Pose, lineup3Pose));
-        lineup3Path.setLinearHeadingInterpolation(score2Pose.getHeading(), lineup3Pose.getHeading(), .8);
-
-        pickup3Path = new Path(new BezierLine(lineup3Pose, pickup3Pose));
-        pickup3Path.setLinearHeadingInterpolation(lineup3Pose.getHeading(), pickup3Pose.getHeading(), .8);
-
-        /*path8 = new Path(new BezierLine(pose8, pose8));
-        path8.setLinearHeadingInterpolation(pose8.getHeading(), pose8.getHeading());
-
-
-    /* Here is an example for Constant Interpolation
-    scorePreload.setConstantInterpolation(startPose.getHeading()); */
-
-        /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-       /* grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .build();*/
 
     }
 
@@ -197,14 +152,14 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if (!follower.isBusy()) {
 
-                    /* Score Preload */
+                /* Score Preload */
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(readyPath);
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                follower.followPath(readyPath);
 
-                    setPathState(1_5);
-                }
-                break;
+                setPathState(1_5);
+            }
+            break;
 
             case 1_5:
                 if (!follower.isBusy()) {
@@ -217,13 +172,13 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 1.25) {
+                if(pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
                 }
                 if (!follower.isBusy()) {
-                    intake.setPower(0);
-                    shooter.setFeedPower(0);
+                   intake.setPower(0);
+                   shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -232,10 +187,10 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
                 }
                 break;
             case 2_5:
-                // if(actionTimer.getElapsedTimeSeconds() > 1) {
-                //     shooter.setFeedPower(0);
-                //     intake.setPower(0);
-                // }
+               // if(actionTimer.getElapsedTimeSeconds() > 1) {
+               //     shooter.setFeedPower(0);
+               //     intake.setPower(0);
+               // }
                 if(!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
                     setPathState(3);
@@ -245,72 +200,11 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
                 if (!follower.isBusy()) {
 
                     follower.followPath(score1Path);
-                    setPathState(4);
-                }
-                break;
-            case 4:
-                if (!follower.isBusy())
-                {
-
-                    //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(-.5);
-                    follower.setMaxPower(MAX_INTAKE_SPEED);
-                    follower.followPath(lineup2Path);
-                    pathTimer.resetTimer();
-                    setPathState(5);
-                }
-                //}
-                break;
-            case 5:
-                if(pathTimer.getElapsedTimeSeconds() > 1.25) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(0);
-                }
-
-                if (!follower.isBusy())
-                {
-                    intake.setPower(0);
-                    shooter.setFeedPower(0);
-
-                    follower.setMaxPower(MAX_DRIVE_SPEED);
-                    // actionTimer.resetTimer();
-                    follower.followPath(pickup2Path);
-                    setPathState(5_5);
-                }
-                break;
-            case 5_5:
-                // if(actionTimer.getElapsedTimeSeconds() > 1) {
-                //   shooter.setFeedPower(0);
-                // intake.setPower(0);
-                //}
-                if(!follower.isBusy()) {
-                    shootForTime(SHOOT_SECONDS);
-                    setPathState(6);
-                }
-                break;
-            case 6:
-                if (!follower.isBusy())
-                {
-
-                    //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
-                    follower.followPath(lineup3Path);
-                    setPathState(7);
-                }
-                //}
-                break;
-            case 7:
-                if (!follower.isBusy()) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(-.5);
-                    follower.setMaxPower(MAX_INTAKE_SPEED);
-                    follower.followPath(pickup3Path);
-                    pathTimer.resetTimer();
                     setPathState(-1);
-            }
-            break;
+                }
+                break;
             case -1:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.25) {
+                if (!follower.isBusy()) {
                     intake.setPower(0);
                     shooter.setFeedPower(0);
                     requestOpModeStop();
@@ -368,7 +262,7 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(8); // matches REDMainTeleOpWORKING
+        limelight.pipelineSwitch(6); // matches BLUEMainTeleOpWORKING
         limelight.start();
 
         buildPaths();
@@ -404,25 +298,25 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
     private double shootForTime(double seconds) {
         ElapsedTime timer = new ElapsedTime();
 
-        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + 1) {
-            if(timer.seconds() > seconds) {
-                shooter.stop();
-                //stopShoot();
-            }
-            else {
-                //intake.setPower(1);
-                follower.update();
-                updateHold();
+        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
+           if(timer.seconds() > seconds) {
+               shooter.stop();
+               //stopShoot();
+           }
+           else {
+               //intake.setPower(1);
+               follower.update();
+               updateHold();
 
-                updateDistanceAndShooterTarget();
+               updateDistanceAndShooterTarget();
 
-                shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
-                shooter.update();
+               shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+               shooter.update();
 
-                telemetry.addData("Shooting (s)", timer.seconds());
-                //telemetry.addData("Distance (cm)", targetDistanceCm);
-                telemetry.update();
-            }
+               telemetry.addData("Shooting (s)", timer.seconds());
+               //telemetry.addData("Distance (cm)", targetDistanceCm);
+               telemetry.update();
+           }
         }
         return timer.seconds();
     }
@@ -483,7 +377,7 @@ public class Serqet_Auto_Far_Red_3rdSpike extends OpMode {
             turn = clamp(turn, -HOLD_MAX_TURN, HOLD_MAX_TURN);
         }
 
-        // follower.holdPoint(holdPoint, turn);
+       // follower.holdPoint(holdPoint, turn);
     }
 
     private static double clamp(double value, double min, double max) {
