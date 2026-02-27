@@ -73,10 +73,10 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
     /* =========================================================
        HARDWARE
        ========================================================= */
-    private Limelight3A limelight;
-    private Follower follower;
-    private ShooterSubsystemSCRIMMAGE shooter;
-    private DcMotorEx intake, lift;
+    private Limelight3A limelight;  // Limelight declaration
+    private Follower follower;      // Instance of the Pedro follower
+    private ShooterSubsystemSCRIMMAGE shooter;  // Instance of our shooter class
+    private DcMotorEx intake, lift;     // Motor declarations
 
     /* =========================================================
        SHOOTING STATE MACHINE
@@ -88,7 +88,7 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
         FEEDING      // Launch the note
     }
 
-    private ShootState shootState = ShootState.IDLE;
+    private ShootState shootState = ShootState.IDLE;     // Initial shoot state
 
     /* =========================================================
        ALIGNMENT TRACKING
@@ -100,20 +100,20 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
     /* =========================================================
        DISTANCE TRACKING
        ========================================================= */
-    private Double smoothedDistanceCm = null;
-    private double targetDistanceCm = 0.0;
+    private Double smoothedDistanceCm = null;   // Smoothed distance from target
+    private double targetDistanceCm = 0.0;      // Distance from target
 
     /* =========================================================
        TAG VISIBILITY TRACKING
        ========================================================= */
-    private long lastTagSeenTimeMs = 0;
-    private double heading = 0;
+    private long lastTagSeenTimeMs = 0;     // How long it's been since the tag has been read
+    private double heading = 0;     // Robot's heading
 
-    public double scalar;
+    public double scalar;       // Scalar for our turbo mode that switches it to full power as opposed to half
 
-    public BezierPoint holdPoint;
+    public BezierPoint holdPoint;   // Instance of the point we want to hold
 
-    public boolean holdInitalized = false;
+    public boolean holdInitalized = false;  // Hold has begun
 
     @Override
     public void runOpMode() {
@@ -132,40 +132,40 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); // AprilTag pipeline
+        limelight.pipelineSwitch(6); // AprilTag pipeline for Blue
         limelight.start();
 
         /* ---------------- Drive / Localization Setup ---------------- */
-        MecanumConstants mecanumConstants = new MecanumConstants()
+        MecanumConstants mecanumConstants = new MecanumConstants()      // Pedro drive control initialization
                 .leftFrontMotorName("front_left")
                 .leftRearMotorName("back_left")
                 .rightFrontMotorName("front_right")
                 .rightRearMotorName("back_right");
 
-        PinpointConstants pinpointConstants = new PinpointConstants()
+        PinpointConstants pinpointConstants = new PinpointConstants()   // Pedro Pinpoint constants initialization
                 .hardwareMapName("pinpoint");
 
-        follower = new FollowerBuilder(new FollowerConstants(), hardwareMap)
+        follower = new FollowerBuilder(new FollowerConstants(), hardwareMap)    // Pedro follower initialization
                 .mecanumDrivetrain(mecanumConstants)
                 .pinpointLocalizer(pinpointConstants)
                 .build();
 
         waitForStart();
-        follower.startTeleOpDrive();
+        follower.startTeleOpDrive();    // Give driver control
 
         /* ---------------- Main Loop ---------------- */
         while (opModeIsActive()) {
-            handleDrive();
-            handleIntake();
-            handleShootingStateMachine();
-            handleLift();
+            handleDrive();  // Handles drive inputs
+            handleIntake(); // Handles Intake inputs
+            handleShootingStateMachine();   // Updates the shooter states
+            handleLift();   // Handles the lift inputs
 
-            shooter.update();
-            follower.update();
-            telemetry.update();
+            shooter.update();   // Updates the shooter every frame
+            follower.update();  // Updates the follower every frame
+            telemetry.update(); // Updates Telemetry every frame
         }
 
-        limelight.stop();
+        limelight.stop();   // Stops limelight from streaming
     }
 
     /* =========================================================
@@ -175,22 +175,22 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
         // Disable manual driving during shooting sequence
         if (shootState != ShootState.IDLE) return;
 
-        if (gamepad1.left_trigger > .5){
+        if (gamepad1.left_trigger > .5){    // Activates turbo mode
             scalar = 1;
         }
-        else if (gamepad1.left_trigger < .5) {
+        else if (gamepad1.left_trigger < .5) {  // Resets back to default if turbo is not needed
             scalar = .5;
         }
 
-        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
-            heading = follower.getHeading();
+        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {   // Resets field centric
+            heading = follower.getHeading();    // Resets our heading variable
         }
-        follower.setTeleOpDrive(
-                scalar * gamepad1.left_stick_y,
+        follower.setTeleOpDrive(    // Does all the logic for driving
+                scalar * gamepad1.left_stick_y,     // The scalar variable is set to what speed we want
                 scalar * gamepad1.left_stick_x,
                 scalar * gamepad1.right_stick_x,
                 false,
-                heading
+                heading     // Uses the heading variable every frame to set the heading
         );
     }
 
@@ -200,14 +200,14 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
     private void handleIntake() {
         if (shootState != ShootState.IDLE) return;
 
-        if (gamepad1.left_bumper) {
-            intake.setPower(1.0);
-            shooter.setFeedPower(-1.0);
+        if (gamepad1.left_bumper) {     // Checks if the left bumper was pressed
+            intake.setPower(1.0);   // Sets intake power to full
+            shooter.setFeedPower(-1.0); // Activates the vault system to pull artifacts towards the shooter
         } else if (gamepad1.right_bumper) {
             intake.setPower(-1.0);
             shooter.setFeedPower(1.0);
         } else {
-            intake.setPower(0.0);
+            intake.setPower(0.0);   // If neither bumpers are pressed it stops the intake and feeder
             shooter.setFeedPower(0.0);
         }
     }
@@ -219,45 +219,45 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
 
         /* -------- Abort if trigger released -------- */
         if (!gamepad1.a && shootState != ShootState.IDLE) {
-            abortShot();
-            holdInitalized = false;
+            abortShot();            // Aborts the shot if we release the shoot button
+            holdInitalized = false; // Cancels Hold
             return;
         }
 
         /* -------- Start shooting sequence -------- */
         if (gamepad1.a && shootState == ShootState.IDLE) {
-            holdInitalized = false;
-            shootState = ShootState.ALIGNING;
-            bestHeadingErrorDeg = Double.MAX_VALUE;
+            holdInitalized = false;     // Sets hold to false since we aren't aligned yet
+            shootState = ShootState.ALIGNING;   // Begin aligning
+            bestHeadingErrorDeg = Double.MAX_VALUE; // Error margin
             alignStallCounter = 0;
             smoothedDistanceCm = null;
         }
 
-        LLResult result = limelight.getLatestResult();
-        boolean tagValid = result != null && result.isValid()
+        LLResult result = limelight.getLatestResult();  // Gets the results from limelight
+        boolean tagValid = result != null && result.isValid() // Saves if it's a valid tag or not
                 && !result.getFiducialResults().isEmpty();
 
-        if (tagValid) {
-            lastTagSeenTimeMs = System.currentTimeMillis();
+        if (tagValid) { // Checks if it is a valid tag
+            lastTagSeenTimeMs = System.currentTimeMillis(); // Updates the last time a tag was seen
         }
 
         /* -------- Safety: lost tag -------- */
         if (shootState != ShootState.IDLE &&
-                System.currentTimeMillis() - lastTagSeenTimeMs > TAG_TIMEOUT_MS) {
-            abortShot();
-            holdInitalized = false;
+                System.currentTimeMillis() - lastTagSeenTimeMs > TAG_TIMEOUT_MS) { // Checks if the tag was seen too long ago
+            abortShot();    // If it was it aborts the shot
+            holdInitalized = false; // And cancels hold
             return;
         }
 
         switch (shootState) {
 
-            case ALIGNING: {
-                holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());
-                heading = follower.getHeading() + Math.toRadians(limelight.getLatestResult().getTx());
+            case ALIGNING: {    // The aligning state
+                holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());  // This is where we set the point we want to hold
+                heading = follower.getHeading() + Math.toRadians(limelight.getLatestResult().getTx());  // aligns to the goal by setting the heading to the target x
             }
-            if(!holdInitalized) {
-                follower.holdPoint(holdPoint, heading);
-                holdInitalized = true;
+            if(!holdInitalized) {   // Checks if hold has been initialized yet
+                follower.holdPoint(holdPoint, heading); // If not it calls hold point using our point we created along with our heading
+                holdInitalized = true;  // Initializes the hold
             }
             else{
                 break;
@@ -266,36 +266,36 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
             /* =====================================================
                SPINNING UP
                ===================================================== */
-            case SPINNING_UP: {
-                follower.update();
-                double distanceMeters =
+            case SPINNING_UP: { // Flywheels begin spinning up
+                follower.update();  // Updates the follower to hold the point
+                double distanceMeters =     // Gets the meters away from the target tag
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
                                 Math.tan(Math.toRadians(result.getTy()
                                         + LIMELIGHT_MOUNT_ANGLE));
 
-                double distanceCm = distanceMeters * 100.0;
+                double distanceCm = distanceMeters * 100.0; // Converts it into centimeters
 
-                smoothedDistanceCm = smoothedDistanceCm == null
+                smoothedDistanceCm = smoothedDistanceCm == null // Smooths out the cm
                         ? distanceCm
                         : ALPHA * distanceCm + (1 - ALPHA) * smoothedDistanceCm;
 
-                targetDistanceCm = smoothedDistanceCm;
+                targetDistanceCm = smoothedDistanceCm;  // Sets the target to the smoothed target
 
-                double targetVelocity =
+                double targetVelocity =     // Passes our target into our calculations class to figure out the velocity needed
                         TrajectorySCRIMMAGE.CalculateVelocity(targetDistanceCm);
-                double targetAngle =
+                double targetAngle =        // Passes our target into our calculations class to figure out the angle needed
                         TrajectorySCRIMMAGE.CalculateAngle(targetDistanceCm);
 
-                shooter.setTarget(targetVelocity, targetAngle);
+                shooter.setTarget(targetVelocity, targetAngle); // Sets the shooter's target to the values returned by the calculation classes
 
-                leftError = Math.abs(Math.abs(
+                leftError = Math.abs(Math.abs(  // Gets the error from the left side of the tag
                         shooter.getLeftVelocity()) - targetVelocity);
-                rightError = Math.abs(Math.abs(
+                rightError = Math.abs(Math.abs(     // Gets the error from the right side of the tag
                         shooter.getRightVelocity()) - targetVelocity);
 
-                if (leftError < FLYWHEEL_TOLERANCE ||
+                if (leftError < FLYWHEEL_TOLERANCE ||   // Checks if the error on either side is too big
                         rightError < FLYWHEEL_TOLERANCE) {
-                    shootState = ShootState.FEEDING;
+                    shootState = ShootState.FEEDING;    // If the error is not too big then it begins feeding artifacts
                 }
 
                 break;
@@ -305,38 +305,38 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
                FEEDING
                ===================================================== */
             case FEEDING:
-                follower.update();
-                shooter.setFeedPower(-1.0);
+                follower.update();  // Updates the follower so it continues to hold point
+                shooter.setFeedPower(-1.0); // Starts passing through artifacts
                 break;
 
             default:
                 break;
         }
 
-        telemetry.addData("Shoot State", shootState);
-        telemetry.addData("Flywheel Error",
+        telemetry.addData("Shoot State", shootState);   // Shows us the shoot state
+        telemetry.addData("Flywheel Error",     // Shows us the error on either side of the tag
                 (leftError + rightError) / 2.0);
-        telemetry.addData("Best Align Error (deg)",
+        telemetry.addData("Best Align Error (deg)",     // Shows us the smallest error in the heading
                 bestHeadingErrorDeg);
-        telemetry.addData("Distance (cm)", targetDistanceCm);
+        telemetry.addData("Distance (cm)", targetDistanceCm);   // Shows the cm from the goal
     }
 
     /* =========================================================
        ABORT
        ========================================================= */
-    private void abortShot() {
-        shootState = ShootState.IDLE;
-        shooter.stop();
-        shooter.setFeedPower(0.0);
-        smoothedDistanceCm = null;
+    private void abortShot() {  // If the shot is aborted
+        shootState = ShootState.IDLE;       // Sets the state to Idle
+        shooter.stop();                 // Stops the flywheels
+        shooter.setFeedPower(0.0);  // Stops the feeder
+        smoothedDistanceCm = null;  // Resets the distance to target
     }
 
-    private void handleLift() {
+    private void handleLift() {     // Checks if the lift buttons have been pressed and if the position is below the max
         if(gamepad1.dpad_up && gamepad1.left_trigger > .75 && lift.getCurrentPosition() < 3600) {    //TODO Changed it so you have to be holding the left trigger to run the lift
-            lift.setPower(1);
+            lift.setPower(1);   // Raises the lift up
         }
         else {
-            lift.setPower(0);
+            lift.setPower(0);   // Stops the lift
         }
     }
 }
