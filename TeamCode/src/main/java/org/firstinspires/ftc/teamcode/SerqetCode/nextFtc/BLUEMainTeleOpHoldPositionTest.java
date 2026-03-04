@@ -52,6 +52,7 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
 
     // Counts consecutive loops without improvement
     private int alignStallCounter = 0;
+    public double turn = 0;
 
     /* =========================================================
        SHOOTER SAFETIES & FILTERING
@@ -202,13 +203,10 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
 
         if (gamepad1.left_bumper) {     // Checks if the left bumper was pressed
             intake.setPower(1.0);   // Sets intake power to full
-            shooter.setFeedPower(-1.0); // Activates the vault system to pull artifacts towards the shooter
         } else if (gamepad1.right_bumper) {
             intake.setPower(-1.0);
-            shooter.setFeedPower(1.0);
         } else {
             intake.setPower(0.0);   // If neither bumpers are pressed it stops the intake and feeder
-            shooter.setFeedPower(0.0);
         }
     }
 
@@ -252,21 +250,46 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
         switch (shootState) {
 
             case ALIGNING: {    // The aligning state
-                holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());  // This is where we set the point we want to hold
-                heading = follower.getHeading() + Math.toRadians(limelight.getLatestResult().getTx());  // aligns to the goal by setting the heading to the target x
-            }
-            if(!holdInitalized) {   // Checks if hold has been initialized yet
-                follower.holdPoint(holdPoint, heading); // If not it calls hold point using our point we created along with our heading
-                holdInitalized = true;  // Initializes the hold
-            }
-            else{
+                follower.update();
+                double tx = result.getTx();
+                double absError = Math.abs(tx);
+
+                /* ----- Track whether we're still improving ----- */
+                if (absError < bestHeadingErrorDeg - ALIGN_MIN_IMPROVEMENT) {
+                    bestHeadingErrorDeg = absError;
+                    alignStallCounter = 0;
+                } else {
+                    alignStallCounter++;
+                }
+
+                /* ----- Compute turn command ----- */
+                turn = ALIGN_KP * (-tx);
+
+                // Enforce minimum command if still meaningfully off
+                if (Math.abs(turn) < ALIGN_MIN_CMD &&
+                        absError > ALIGN_ACCEPTABLE_ERROR) {
+                    turn = Math.copySign(ALIGN_MIN_CMD, turn);
+                }
+
+                follower.setTeleOpDrive(0, 0, turn, false, heading);
+
+                if (absError <= ALIGN_ACCEPTABLE_ERROR &&
+                        alignStallCounter >= ALIGN_STALL_CYCLES) {
+                    holdPoint = new BezierPoint(follower.getPose().getX(), follower.getPose().getY());  // This is where we set the point we want to hold
+                    shootState = ShootState.SPINNING_UP;
+                }
                 break;
             }
+
 
             /* =====================================================
                SPINNING UP
                ===================================================== */
             case SPINNING_UP: { // Flywheels begin spinning up
+                if(!holdInitalized) {   // Checks if hold has been initialized yet
+                    follower.holdPoint(holdPoint, heading); // If not it calls hold point using our point we created along with our heading
+                    holdInitalized = true;  // Initializes the hold
+                }
                 follower.update();  // Updates the follower to hold the point
                 double distanceMeters =     // Gets the meters away from the target tag
                         (TARGET_HEIGHT - LIMELIGHT_HEIGHT) /
@@ -306,7 +329,7 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
                ===================================================== */
             case FEEDING:
                 follower.update();  // Updates the follower so it continues to hold point
-                shooter.setFeedPower(-1.0); // Starts passing through artifacts
+                intake.setPower(1); // Starts passing through artifacts
                 break;
 
             default:
@@ -327,7 +350,7 @@ public class BLUEMainTeleOpHoldPositionTest extends LinearOpMode {
     private void abortShot() {  // If the shot is aborted
         shootState = ShootState.IDLE;       // Sets the state to Idle
         shooter.stop();                 // Stops the flywheels
-        shooter.setFeedPower(0.0);  // Stops the feeder
+        intake.setPower(0);  // Stops the feeder
         smoothedDistanceCm = null;  // Resets the distance to target
     }
 

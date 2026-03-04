@@ -371,16 +371,17 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
             intake.setPower(0);
             intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             intake.setTargetPosition(0);
-            intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             pullBackStarted = true;
         }
-        if (shootState != ShootState.SPINNING_UP) {
-            if (intake.getCurrentPosition() > target && pullBackStarted) {
+        if (shootState != ShootState.SPINNING_UP && pullBackStarted) {
+            if (intake.getCurrentPosition() > target) {
                 intake.setPower(-1);
                 shooter.setTarget(-250, .205);
             } else {
                 intake.setPower(0);
                 shooter.setTarget(0, .205);
+                pullBackStarted = false;
             }
         }
 
