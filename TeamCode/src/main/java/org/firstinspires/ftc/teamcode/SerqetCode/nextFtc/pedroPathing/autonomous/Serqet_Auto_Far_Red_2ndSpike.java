@@ -10,6 +10,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
+@Disabled
 @Autonomous(name = "Far Red 2nd Spike", group = "Examples", preselectTeleOp = "RED Main TeleOp")
 public class Serqet_Auto_Far_Red_2ndSpike extends OpMode {
 

@@ -34,8 +34,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Far Blue 3rd Spike", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
- public class Serqet_Auto_Far_Blue_3rdSpike_Selection extends SelectableOpMode {
+@Autonomous(name = "Blue Auto Selection", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
+ public class Blue_Auto_Far_Selection extends SelectableOpMode {
     public static Follower follower;
 
     @IgnoreConfigurable
@@ -47,7 +47,7 @@ import java.util.List;
     @IgnoreConfigurable
     static ArrayList<String> changes = new ArrayList<>();
 
-    public Serqet_Auto_Far_Blue_3rdSpike_Selection() {
+    public Blue_Auto_Far_Selection() {
         super("Select a Tuning OpMode", s -> {
             s.folder("Spikes", l -> {
                 l.add("Just Preload", Far_Blue_Preload::new);
@@ -103,7 +103,7 @@ import java.util.List;
 }
 
 //TODO PRELOAD
-@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
+//@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_Preload extends LinearOpMode {
     private DcMotorEx frontRight, frontLeft, backRight, backLeft;
 
@@ -445,7 +445,7 @@ class Far_Blue_Preload extends LinearOpMode {
 
 //TODO 1st SPIKE MARK
 
-@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
+//@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_1stSpike extends OpMode {
 
     private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
@@ -815,7 +815,7 @@ class Far_Blue_1stSpike extends OpMode {
 
 
 //TODO 2nd SPIKE MARK
-@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
+//@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_2ndSpike extends OpMode {
 
     private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
@@ -1252,7 +1252,7 @@ class Far_Blue_2ndSpike extends OpMode {
 
 //TODO 3rd SPIKE MARK
 
-@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
+//@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_3rdSpike extends OpMode {
 
     private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
@@ -1327,12 +1327,12 @@ class Far_Blue_3rdSpike extends OpMode {
     private final Pose scorePose = new Pose(53.6, 13/*11.1*/, Math.toRadians(108)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose score2Pose = new Pose(60, 90, Math.toRadians(135));
     private final Pose pickup1Pose = new Pose(14, 44.8, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(14,69, Math.toRadians(180));
+    private final Pose pickup2Pose = new Pose(14, 69, Math.toRadians(180));
     private final Pose pickup3Pose = new Pose(16, 93.5, Math.toRadians(180));
     private final Pose lineup1Pose = new Pose(41, 44.8, Math.toRadians(180));
-    private final Pose lineup2Pose = new Pose(41.9,69,Math.toRadians(180));
+    private final Pose lineup2Pose = new Pose(41.9, 69, Math.toRadians(180));
     private final Pose lineup3Pose = new Pose(41, 93.5, Math.toRadians(180));
-    private final Pose empty = new Pose(16.2,69.8,Math.toRadians(180));
+    private final Pose empty = new Pose(16.2, 69.8, Math.toRadians(180));
     private final Pose endPose = new Pose(53.6, 20, Math.toRadians(0));
 
 
@@ -1354,19 +1354,19 @@ class Far_Blue_3rdSpike extends OpMode {
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading(), .5);
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading(), .8);
 
         readyPath = new Path(new BezierLine(scorePose, lineup1Pose));
-        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading(), .8);
+        readyPath.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading(), 1);
 
-        lineup1Path = new Path(new BezierLine(lineup1Pose, pickup1Pose)) ;
-        lineup1Path.setLinearHeadingInterpolation(lineup1Pose.getHeading(), pickup1Pose.getHeading(), .5);
+        lineup1Path = new Path(new BezierLine(lineup1Pose, pickup1Pose));
+        lineup1Path.setLinearHeadingInterpolation(lineup1Pose.getHeading(), pickup1Pose.getHeading(), .8);
 
         pickup1Path = new Path(new BezierLine(pickup1Pose, scorePose));
         pickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading(), .8);
 
-        score1Path = new Path(new BezierLine(scorePose, lineup2Pose ));
-        score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading(), .5);
+        score1Path = new Path(new BezierLine(scorePose, lineup2Pose));
+        score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup2Pose.getHeading(), 1);
 
         lineup2Path = new Path(new BezierLine(lineup2Pose, pickup2Pose));
         lineup2Path.setLinearHeadingInterpolation(lineup2Pose.getHeading(), pickup2Pose.getHeading(), .8);
@@ -1384,7 +1384,7 @@ class Far_Blue_3rdSpike extends OpMode {
         endPath.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading(), .8);
 
         lineup3Path = new Path(new BezierLine(score2Pose, lineup3Pose));
-        lineup3Path.setLinearHeadingInterpolation(score2Pose.getHeading(), lineup3Pose.getHeading(), .8);
+        lineup3Path.setLinearHeadingInterpolation(score2Pose.getHeading(), lineup3Pose.getHeading(), 1);
 
         pickup3Path = new Path(new BezierLine(lineup3Pose, pickup3Pose));
         pickup3Path.setLinearHeadingInterpolation(lineup3Pose.getHeading(), pickup3Pose.getHeading(), .8);
@@ -1411,7 +1411,7 @@ class Far_Blue_3rdSpike extends OpMode {
                 setPathState(1_10);
                 break;
             case 1_10:
-                if(!follower.isBusy()) {
+                if (!follower.isBusy()) {
                     //shooter.setFeedPower(-1);
                     //shooter.setTarget(1180, 20);
                     shootForTime(SHOOT_SECONDS);
@@ -1442,6 +1442,7 @@ class Far_Blue_3rdSpike extends OpMode {
                 if (!follower.isBusy()) {
                     intake.setPower(1);
                     shooter.setFeedPower(-.5);
+                    shooter.setTarget(-200, .205);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
                     pathTimer.resetTimer();
@@ -1449,9 +1450,10 @@ class Far_Blue_3rdSpike extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                if (pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
+                    shooter.setTarget(-200, .205);
                 }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
@@ -1460,6 +1462,7 @@ class Far_Blue_3rdSpike extends OpMode {
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
                     //actionTimer.resetTimer();
+                    actionTimer.resetTimer();
                     setPathState(2_5);
                 }
                 break;
@@ -1468,7 +1471,7 @@ class Far_Blue_3rdSpike extends OpMode {
                 //     shooter.setFeedPower(0);
                 //     intake.setPower(0);
                 // }
-                if(!follower.isBusy()) {
+                if (!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
                     setPathState(3);
                 }
@@ -1481,8 +1484,7 @@ class Far_Blue_3rdSpike extends OpMode {
                 }
                 break;
             case 4:
-                if (!follower.isBusy())
-                {
+                if (!follower.isBusy()) {
 
                     //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
                     intake.setPower(1);
@@ -1495,19 +1497,19 @@ class Far_Blue_3rdSpike extends OpMode {
                 //}
                 break;
             case 5:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                if (pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(1);
                     shooter.setFeedPower(0);
                 }
 
-                if (!follower.isBusy())
-                {
+                if (!follower.isBusy()) {
                     intake.setPower(0);
                     shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     // actionTimer.resetTimer();
                     follower.followPath(pickup2Path);
+                    actionTimer.resetTimer();
                     setPathState(5_5);
                 }
                 break;
@@ -1516,14 +1518,13 @@ class Far_Blue_3rdSpike extends OpMode {
                 //   shooter.setFeedPower(0);
                 // intake.setPower(0);
                 //}
-                if(!follower.isBusy()) {
+                if (!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy())
-                {
+                if (!follower.isBusy()) {
 
                     //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
                     follower.followPath(lineup3Path);
@@ -1569,6 +1570,7 @@ class Far_Blue_3rdSpike extends OpMode {
 
         // These loop the movements of the robot, these must be called continuously in order to work
         follower.update();
+        shooter.update();
         autonomousPathUpdate();
 
         // Feedback to Driver Hub for debugging
@@ -1636,28 +1638,35 @@ class Far_Blue_3rdSpike extends OpMode {
     private double shootForTime(double seconds) {
         ElapsedTime timer = new ElapsedTime();
 
-        while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
-            if(timer.seconds() > seconds) {
-                shooter.stop();
-                //stopShoot();
+        if (actionTimer.getElapsedTimeSeconds() < .1) {
+            shooter.setFeedPower(1);
+        }
+        else {
+            shooter.setFeedPower(0);
+            while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
+                if (timer.seconds() > seconds) {
+                    shooter.stop();
+                    //stopShoot();
+                } else {
+                    //intake.setPower(1);
+                    follower.update();
+                    updateHold();
+
+                    updateDistanceAndShooterTarget();
+
+                    shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+                    shooter.update();
+
+                    telemetry.addData("Shooting (s)", timer.seconds());
+                    //telemetry.addData("Distance (cm)", targetDistanceCm);
+                    telemetry.update();
+                }
             }
-            else {
-                //intake.setPower(1);
-                follower.update();
-                updateHold();
-
-                updateDistanceAndShooterTarget();
-
-                shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
-                shooter.update();
-
-                telemetry.addData("Shooting (s)", timer.seconds());
-                //telemetry.addData("Distance (cm)", targetDistanceCm);
-                telemetry.update();
-            }
+            return timer.seconds();
         }
         return timer.seconds();
     }
+
 
     private void stopShoot() {
         shooter.setTarget(0, .205);

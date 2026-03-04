@@ -7,17 +7,16 @@ import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-@Disabled
-@TeleOp(name = "RED Main TeleOp", group = "PedroPathing")
-public class REDMainTeleOpWORKING extends LinearOpMode {
+@TeleOp(name = "RED Main TeleOp NEW INTAKE", group = "PedroPathing")
+public class REDMainTeleOpNEW_INTAKE extends LinearOpMode {
 
     /* =========================================================
        LIMELIGHT GEOMETRY CONSTANTS
@@ -70,6 +69,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
     // Telemetry values
     public double leftError;
     public double rightError;
+    public double pullBackTicks = 0;
 
     /* =========================================================
        HARDWARE
@@ -111,6 +111,8 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
     private double heading = 0;
 
     public double scalar;
+    public boolean pullBackStarted = false;
+
     @Override
     public void runOpMode() {
 
@@ -156,6 +158,9 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
             handleShootingStateMachine();
             handleLift();
 
+            handlePullBack(pullBackTicks);
+
+
             shooter.update();
             follower.update();
             telemetry.update();
@@ -198,13 +203,12 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
 
         if (gamepad1.left_bumper) {
             intake.setPower(1.0);
-            shooter.setFeedPower(-1.0);
+            shooter.setTarget(-250, .205);
         } else if (gamepad1.right_bumper) {
             intake.setPower(-1.0);
-            shooter.setFeedPower(1.0);
         } else {
             intake.setPower(0.0);
-            shooter.setFeedPower(0.0);
+            shooter.setTarget(0, .205);
         }
     }
 
@@ -336,7 +340,7 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
                ===================================================== */
             case FEEDING:
                 follower.setTeleOpDrive(0, 0, 0, false, heading);
-                shooter.setFeedPower(-1.0);
+                intake.setPower(1);
                 break;
 
             default:
@@ -357,8 +361,29 @@ public class REDMainTeleOpWORKING extends LinearOpMode {
     private void abortShot() {
         shootState = ShootState.IDLE;
         shooter.stop();
-        shooter.setFeedPower(0.0);
+        intake.setPower(0);
         smoothedDistanceCm = null;
+    }
+
+    private void handlePullBack(double target) {
+        if(shootState == ShootState.SPINNING_UP) return;
+        if(gamepad1.xWasPressed()) {
+            intake.setPower(0);
+            intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            intake.setTargetPosition(0);
+            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pullBackStarted = true;
+        }
+        if (shootState != ShootState.SPINNING_UP && pullBackStarted) {
+            if (intake.getCurrentPosition() > target) {
+                intake.setPower(-1);
+                shooter.setTarget(-250, .205);
+            } else {
+                intake.setPower(0);
+                shooter.setTarget(0, .205);
+            }
+        }
+
     }
 
     private void handleLift() {
