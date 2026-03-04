@@ -186,7 +186,7 @@ public class BLUE_Auto_Corner extends OpMode {
                 break;
             case 2:
                 if(pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(1);
+                    intake.setPower(0);
                 }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
@@ -226,7 +226,7 @@ public class BLUE_Auto_Corner extends OpMode {
                 break;
             case 5:
                 if(pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(1);
+                    intake.setPower(0);
                 }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
@@ -262,7 +262,7 @@ public class BLUE_Auto_Corner extends OpMode {
                 break;
             case 9:
                 if(pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(1);
+                    intake.setPower(0);
                 }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
