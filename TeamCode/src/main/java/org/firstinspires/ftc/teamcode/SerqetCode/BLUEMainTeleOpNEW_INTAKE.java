@@ -69,6 +69,7 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
     // Telemetry values
     public double leftError;
     public double rightError;
+    public double pullBackTicks = 0;
 
     /* =========================================================
        HARDWARE
@@ -110,6 +111,7 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
     private double heading = 0;
 
     public double scalar;
+    public boolean pullBackStarted = false;
 
     @Override
     public void runOpMode() {
@@ -155,6 +157,9 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
             handleIntake();
             handleShootingStateMachine();
             handleLift();
+
+            handlePullBack(pullBackTicks);
+
 
             shooter.update();
             follower.update();
@@ -358,6 +363,27 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
         shooter.stop();
         intake.setPower(0);
         smoothedDistanceCm = null;
+    }
+
+    private void handlePullBack(double target) {
+        if(shootState == ShootState.SPINNING_UP) return;
+        if(gamepad1.xWasPressed()) {
+            intake.setPower(0);
+            intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            intake.setTargetPosition(0);
+            intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            pullBackStarted = true;
+        }
+        if (shootState != ShootState.SPINNING_UP) {
+            if (intake.getCurrentPosition() > target && pullBackStarted) {
+                intake.setPower(-1);
+                shooter.setTarget(-250, .205);
+            } else {
+                intake.setPower(0);
+                shooter.setTarget(0, .205);
+            }
+        }
+
     }
 
     private void handleLift() {
