@@ -448,7 +448,7 @@ class Far_Blue_Preload extends LinearOpMode {
 //@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_1stSpike extends OpMode {
 
-    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 1.75;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
     private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
@@ -586,7 +586,6 @@ class Far_Blue_1stSpike extends OpMode {
             case 1_5:
                 if (!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
                     pathTimer.resetTimer();
@@ -594,13 +593,12 @@ class Far_Blue_1stSpike extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
+                if(pathTimer.getElapsedTimeSeconds() > .05) {
                     intake.setPower(1);
-                    shooter.setFeedPower(0);
+
                 }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -628,7 +626,6 @@ class Far_Blue_1stSpike extends OpMode {
             case -1:
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
                     requestOpModeStop();
                 }
 
@@ -732,7 +729,7 @@ class Far_Blue_1stSpike extends OpMode {
 
                 updateDistanceAndShooterTarget();
 
-                shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+                intake.setPower(1);
                 shooter.update();
 
                 telemetry.addData("Shooting (s)", timer.seconds());
@@ -818,11 +815,11 @@ class Far_Blue_1stSpike extends OpMode {
 //@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_2ndSpike extends OpMode {
 
-    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 1.5;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
-    private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
-    private static final double MAX_INTAKE_SPEED = .35; // Change this if we need to intake slower
+    private static final double MAX_DRIVE_SPEED = .8; // Change this for the max speed
+    private static final double MAX_INTAKE_SPEED = .5; // Change this if we need to intake slower
     private static final double DRIVE_POWER = 0.7;
     private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
 
@@ -971,7 +968,6 @@ class Far_Blue_2ndSpike extends OpMode {
             case 1_5:
                 if (!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
                     pathTimer.resetTimer();
@@ -979,13 +975,8 @@ class Far_Blue_2ndSpike extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(0);
-                }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -1016,7 +1007,6 @@ class Far_Blue_2ndSpike extends OpMode {
 
                     //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup2Path);
                     pathTimer.resetTimer();
@@ -1025,15 +1015,11 @@ class Far_Blue_2ndSpike extends OpMode {
                 //}
                 break;
             case 5:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(0);
-                }
 
                 if (!follower.isBusy())
                 {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
+
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     // actionTimer.resetTimer();
@@ -1064,7 +1050,6 @@ class Far_Blue_2ndSpike extends OpMode {
             case -1:
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
                     requestOpModeStop();
                 }
 
@@ -1168,7 +1153,7 @@ class Far_Blue_2ndSpike extends OpMode {
 
                 updateDistanceAndShooterTarget();
 
-                shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+               intake.setPower(1);
                 shooter.update();
 
                 telemetry.addData("Shooting (s)", timer.seconds());
@@ -1255,7 +1240,7 @@ class Far_Blue_2ndSpike extends OpMode {
 //@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
 class Far_Blue_3rdSpike extends OpMode {
 
-    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 1.2;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
     private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
@@ -1441,7 +1426,6 @@ class Far_Blue_3rdSpike extends OpMode {
             case 1_5:
                 if (!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-.5);
                     shooter.setTarget(-200, .205);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
@@ -1450,14 +1434,12 @@ class Far_Blue_3rdSpike extends OpMode {
                 }
                 break;
             case 2:
-                if (pathTimer.getElapsedTimeSeconds() > 2) {
+                if (pathTimer.getElapsedTimeSeconds() > .5) {
                     intake.setPower(1);
-                    shooter.setFeedPower(0);
-                    shooter.setTarget(-200, .205);
+                    shooter.setTarget(-250, .205);
                 }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -1488,7 +1470,6 @@ class Far_Blue_3rdSpike extends OpMode {
 
                     //if(shootForTime(SHOOT_SECONDS) >= SHOOT_SECONDS) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup2Path);
                     pathTimer.resetTimer();
@@ -1497,14 +1478,12 @@ class Far_Blue_3rdSpike extends OpMode {
                 //}
                 break;
             case 5:
-                if (pathTimer.getElapsedTimeSeconds() > 2) {
+                if (pathTimer.getElapsedTimeSeconds() > .5) {
                     intake.setPower(1);
-                    shooter.setFeedPower(0);
                 }
 
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     // actionTimer.resetTimer();
@@ -1535,7 +1514,6 @@ class Far_Blue_3rdSpike extends OpMode {
             case 7:
                 if (!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setFeedPower(-.5);
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(pickup3Path);
                     pathTimer.resetTimer();
@@ -1543,9 +1521,8 @@ class Far_Blue_3rdSpike extends OpMode {
                 }
                 break;
             case -1:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(0);
-                    shooter.setFeedPower(0);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
+                    intake.setPower(1);
                     requestOpModeStop();
                 }
 
@@ -1639,10 +1616,10 @@ class Far_Blue_3rdSpike extends OpMode {
         ElapsedTime timer = new ElapsedTime();
 
         if (actionTimer.getElapsedTimeSeconds() < .1) {
-            shooter.setFeedPower(1);
+            intake.setPower(-1);
         }
         else {
-            shooter.setFeedPower(0);
+            intake.setPower(0);
             while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
                 if (timer.seconds() > seconds) {
                     shooter.stop();
@@ -1654,7 +1631,7 @@ class Far_Blue_3rdSpike extends OpMode {
 
                     updateDistanceAndShooterTarget();
 
-                    shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+                    intake.setPower(1);
                     shooter.update();
 
                     telemetry.addData("Shooting (s)", timer.seconds());

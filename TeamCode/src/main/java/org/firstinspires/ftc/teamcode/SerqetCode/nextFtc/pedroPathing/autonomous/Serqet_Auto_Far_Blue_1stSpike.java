@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
     private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
-    private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
+    private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed TODO See how far we can push these speeds
     private static final double MAX_INTAKE_SPEED = .35; // Change this if we need to intake slower
     private static final double DRIVE_POWER = 0.7;
     private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
@@ -94,7 +94,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
     private final Pose startPose = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(53.6, 13/*11.1*/, Math.toRadians(108)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(14, 44.8, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup1Pose = new Pose(14, 44.8, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark. TODO See if we can shorten this path
     private final Pose lineup1Pose = new Pose(41, 44.8, Math.toRadians(180));
 
 
@@ -161,8 +161,8 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
             case 1_5:
                 if (!follower.isBusy()) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(-.5);
+                    intake.setPower(1); //TODO Try lowering the power to prevent it from feeding too long
+                    shooter.setFeedPower(-.5);  // TODO Have the flywheels spin in reverse while intaking
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
                     pathTimer.resetTimer();
@@ -189,7 +189,7 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
                //     shooter.setFeedPower(0);
                //     intake.setPower(0);
                // }
-                if(!follower.isBusy()) {
+                if(!follower.isBusy()) {    // TODO Copy the code in to roll back the flywheels and intake
                     shootForTime(SHOOT_SECONDS);
                     setPathState(3);
                 }

@@ -69,7 +69,7 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
     // Telemetry values
     public double leftError;
     public double rightError;
-    public double pullBackTicks = 0;
+    public double pullBackTicks = -60;
 
     /* =========================================================
        HARDWARE
@@ -176,14 +176,13 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
         // Disable manual driving during shooting sequence
         if (shootState != ShootState.IDLE) return;
 
-        if (gamepad1.left_trigger > .5){
+        if (gamepad1.left_trigger > .5) {
             scalar = 1;
-        }
-        else if (gamepad1.left_trigger < .5) {
+        } else if (gamepad1.left_trigger < .5) {
             scalar = .5;
         }
 
-        if(gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
+        if (gamepad1.left_trigger > .75 && gamepad1.right_trigger > .75) {
             heading = follower.getHeading();
         }
         follower.setTeleOpDrive(
@@ -256,7 +255,7 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
                  - Error is already acceptable AND
                  - Further improvement has stalled
                ===================================================== */
-            case ALIGNING: {
+            case ALIGNING: {        // TODO Have Sarah look into this to make it faster
 
                 // Manual override → skip alignment and keep scoring
                 if (gamepad1.b) {
@@ -366,8 +365,8 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
     }
 
     private void handlePullBack(double target) {
-        if(shootState == ShootState.SPINNING_UP) return;
-        if(gamepad1.xWasPressed()) {
+        if (shootState == ShootState.SPINNING_UP) return;
+        if (gamepad1.xWasPressed()) {
             intake.setPower(0);
             intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             intake.setTargetPosition(0);
@@ -388,10 +387,9 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
     }
 
     private void handleLift() {
-        if(gamepad1.dpad_up && gamepad1.left_trigger > .75 && lift.getCurrentPosition() < 3600) {    //TODO Changed it so you have to be holding the left trigger to run the lift
+        if (gamepad1.dpad_up && gamepad1.left_trigger > .75 && lift.getCurrentPosition() < 3600) {    //TODO Changed it so you have to be holding the left trigger to run the lift
             lift.setPower(1);
-        }
-        else {
+        } else {
             lift.setPower(0);
         }
     }

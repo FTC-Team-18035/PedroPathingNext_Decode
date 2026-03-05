@@ -8,6 +8,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -17,8 +18,9 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
+@Autonomous
 public class BLUE_Auto_Corner extends OpMode {
-    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 1.75;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
     private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
@@ -88,8 +90,8 @@ public class BLUE_Auto_Corner extends OpMode {
 
     private final Pose startPose = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(53.6, 13/*11.1*/, Math.toRadians(108)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose lineupPose = new Pose(9, 25, Math.toRadians(270));
-    private final Pose pickupPose = new Pose(9, 9, Math.toRadians(270));
+    private final Pose lineupPose = new Pose(2, 35, Math.toRadians(270));   // TODO refine this position
+    private final Pose pickupPose = new Pose(2, 19, Math.toRadians(270));
     private final Pose endPose = new Pose(37,13, Math.toRadians(180));
 
 
