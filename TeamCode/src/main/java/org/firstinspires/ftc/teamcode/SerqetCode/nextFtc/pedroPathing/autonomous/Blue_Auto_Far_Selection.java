@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.SerqetCode.BLUEMainTeleOpNEW_INTAKE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.pedroPathing.Constants;
 
@@ -449,6 +450,7 @@ class Far_Blue_Preload extends LinearOpMode {
 class Far_Blue_1stSpike extends OpMode {
 
     private static final double SHOOT_SECONDS = 1.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double INTAKE_SECONDS = 2;
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
     private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
@@ -508,11 +510,20 @@ class Far_Blue_1stSpike extends OpMode {
 
     private Double smoothedDistanceCm = null;
     private double targetDistanceCm = DEFAULT_DISTANCE_CM;
+    private boolean reverseIntake = false;
+    private boolean pullBackStarted = false;
+    private boolean intaking = false;
+    private boolean firstTime = false;
+    private boolean startFeeding = false;
 
     private BezierPoint holdPoint = null;
     private double holdHeadingRad = 0.0;
     private boolean holdInitialized = false;
     private Timer pathTimer, actionTimer, opmodeTimer;
+    private ElapsedTime intakeTimer = new ElapsedTime();
+    public double leftError;
+    public double rightError;
+    private static final double FLYWHEEL_TOLERANCE = 50;
 
     private int pathState;
 
@@ -585,24 +596,21 @@ class Far_Blue_1stSpike extends OpMode {
 
             case 1_5:
                 if (!follower.isBusy()) {
-                    intake.setPower(1);
+                    startIntaking();
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
-                    pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > .05) {
-                    intake.setPower(1);
 
-                }
                 if (!follower.isBusy()) {
                     intake.setPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
                     //actionTimer.resetTimer();
+                    handleIntake(-60);
                     setPathState(2_5);
                 }
                 break;
@@ -651,6 +659,10 @@ class Far_Blue_1stSpike extends OpMode {
         // These loop the movements of the robot, these must be called continuously in order to work
         follower.update();
         autonomousPathUpdate();
+        shooter.update();
+        if(intaking) {
+            intakeForTime(INTAKE_SECONDS);
+        }
 
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
@@ -714,22 +726,69 @@ class Far_Blue_1stSpike extends OpMode {
     public void stop() {
     }
 
+    private void handleIntake(double target) {
+        if (!pullBackStarted) {
+            intake.setPower(0);
+            intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            intake.setTargetPosition(0);
+            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pullBackStarted = true;
+        }
+        else if (pullBackStarted) {
+            if (intake.getCurrentPosition() > target) {
+                intake.setPower(-1);
+                shooter.setTarget(-250, .205);
+            } else {
+                intake.setPower(0);
+                shooter.setTarget(0, .205);
+                pullBackStarted = false;
+            }
+        }
+
+    }
+    private void startIntaking() {
+        intakeTimer.reset();
+        intaking = true;
+    }
+
+    private double intakeForTime(double seconds) {
+
+        if (opmodeTimer.getElapsedTimeSeconds() < 30 && intakeTimer.seconds() < seconds + .2) {
+            if(intakeTimer.seconds() > seconds) {
+                intake.setPower(0);
+                shooter.setTarget(0, .205);
+                intaking = false;
+            }
+            else {
+                intake.setPower(1);
+                shooter.setTarget(-250, .205);
+            }
+        }
+
+        return intakeTimer.seconds();
+    }
+
     private double shootForTime(double seconds) {
         ElapsedTime timer = new ElapsedTime();
 
         while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
             if(timer.seconds() > seconds) {
                 shooter.stop();
+                intake.setPower(0);
+                startFeeding = false;
                 //stopShoot();
             }
             else {
                 //intake.setPower(1);
+
                 follower.update();
                 updateHold();
 
                 updateDistanceAndShooterTarget();
 
-                intake.setPower(1);
+                if(startFeeding) {
+                    intake.setPower(1);
+                }
                 shooter.update();
 
                 telemetry.addData("Shooting (s)", timer.seconds());
@@ -769,6 +828,16 @@ class Far_Blue_1stSpike extends OpMode {
         double targetVelocity = TrajectorySCRIMMAGE.CalculateVelocity(targetDistanceCm);
         double targetAngle = TrajectorySCRIMMAGE.CalculateAngle(targetDistanceCm);
         shooter.setTarget(targetVelocity, targetAngle);
+
+        leftError = Math.abs(Math.abs(
+                shooter.getLeftVelocity()) - targetVelocity);
+        rightError = Math.abs(Math.abs(
+                shooter.getRightVelocity()) - targetVelocity);
+
+        if (leftError < FLYWHEEL_TOLERANCE ||
+                rightError < FLYWHEEL_TOLERANCE) {
+            startFeeding = true;
+        }
     }
 
     private void beginHoldFromCurrentPose() {
