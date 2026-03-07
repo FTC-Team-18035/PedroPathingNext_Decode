@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
-
 @TeleOp(name = "RED Main TeleOp NEW INTAKE", group = "PedroPathing")
 public class REDMainTeleOpNEW_INTAKE extends LinearOpMode {
 
