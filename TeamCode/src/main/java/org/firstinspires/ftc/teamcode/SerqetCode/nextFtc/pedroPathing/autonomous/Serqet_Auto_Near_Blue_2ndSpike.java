@@ -22,11 +22,11 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 @Autonomous(name = "Near Blue 2nd Spike", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
 public class Serqet_Auto_Near_Blue_2ndSpike extends OpMode {
 
-    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 1.5;           // TODO: Change this if isn't enough time or too much...6 was too much
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
-    private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
-    private static final double MAX_INTAKE_SPEED = .35; // Change this if we need to intake slower
+    private static final double MAX_DRIVE_SPEED = .8; // Change this for the max speed
+    private static final double MAX_INTAKE_SPEED = .5; // Change this if we need to intake slower
     private static final double DRIVE_POWER = 0.7;
     private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
 
@@ -92,9 +92,9 @@ public class Serqet_Auto_Near_Blue_2ndSpike extends OpMode {
 
     private final Pose startPose = new Pose(56, 136, Math.toRadians(270)); // Start Pose of our robot.
     private final Pose scorePose = new Pose(56, 89, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(20, 84, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup1Pose = new Pose(25, 84, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose lineup1Pose = new Pose(41, 84, Math.toRadians(180));
-    private final Pose pickup2Pose = new Pose(17,60 , Math.toRadians(180));
+    private final Pose pickup2Pose = new Pose(24,60 , Math.toRadians(180));
     private final Pose lineup2Pose = new Pose(40, 60, Math.toRadians(180));
 
 
