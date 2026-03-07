@@ -8,6 +8,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -19,11 +20,12 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 
 //TODO 1st SPIKE MARK
 
+@Autonomous
 //@Autonomous(preselectTeleOp = "BLUE Main TeleOp")
-class Serqet_Auto_Far_Blue_1stSpike_NinTimebased extends OpMode {
+public class Serqet_Auto_Far_Blue_1stSpike_NonTimebased extends OpMode {
 
     private static final double SHOOT_SECONDS = 1.75;           // TODO: Change this if isn't enough time or too much...6 was too much
-    private static final double INTAKE_DISTANCE = 650;
+    private static final double INTAKE_DISTANCE = 2275;
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
 
     private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
@@ -161,7 +163,6 @@ class Serqet_Auto_Far_Blue_1stSpike_NinTimebased extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(readyPath);
-
                     setPathState(1_5);
                 }
                 break;
@@ -175,9 +176,7 @@ class Serqet_Auto_Far_Blue_1stSpike_NinTimebased extends OpMode {
                 }
                 break;
             case 2:
-
                 if (!follower.isBusy()) {
-                    intake.setPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -333,7 +332,7 @@ class Serqet_Auto_Far_Blue_1stSpike_NinTimebased extends OpMode {
     private void intake() {
         double intakePosition = intake.getCurrentPosition();
 
-        if(intakePosition >= INTAKE_DISTANCE && intakeReset) {
+        if(intakePosition >= INTAKE_DISTANCE) {
             intake.setPower(0);
             intaking = false;
         }
