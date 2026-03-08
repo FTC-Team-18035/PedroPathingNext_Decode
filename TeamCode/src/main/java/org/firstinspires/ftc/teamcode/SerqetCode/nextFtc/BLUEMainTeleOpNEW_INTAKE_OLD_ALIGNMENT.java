@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.SerqetCode;
+package org.firstinspires.ftc.teamcode.SerqetCode.nextFtc;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
@@ -11,14 +11,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.TrajectorySCRIMMAGE;
 import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsystemSCRIMMAGE;
 
-
-@TeleOp(name = "BLUE Main TeleOp NEW ALIGNMENT ***NOT WORKING***", group = "PedroPathing")
-public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
+@TeleOp(name = "BLUE Main TeleOp NEW INTAKE", group = "PedroPathing")
+public class BLUEMainTeleOpNEW_INTAKE_OLD_ALIGNMENT extends LinearOpMode {
 
     /* =========================================================
        LIMELIGHT GEOMETRY CONSTANTS
@@ -38,15 +36,22 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
        ========================================================= */
 
     // Proportional gain converting heading error → turn power
-    private static final double ALIGN_KP = 0.013;
-    private static final double ALIGN_KD = 0.0017;
-    private static final double FF = .15;
-    private static final double angleTolerance = .4;
-    public double curTime = 0;
-    public double lastTime = 0;
-    public double error = 0;
-    public double lastError = 0;
-    public double rotate = 0;
+    private static final double ALIGN_KP = -0.015;
+
+    // Minimum turn command to overcome drivetrain friction
+    private static final double ALIGN_MIN_CMD = 0.09;
+
+    // "Good enough" heading accuracy (degrees)
+    private static final double ALIGN_ACCEPTABLE_ERROR = 0.35;
+
+    // Smallest improvement considered meaningful (degrees)
+    private static final double ALIGN_MIN_IMPROVEMENT = 0.02;
+
+    // How many loops with no improvement we allow before declaring a stall
+    private static final int ALIGN_STALL_CYCLES = 8;
+
+    // Counts consecutive loops without improvement
+    private int alignStallCounter = 0;
 
     /* =========================================================
        SHOOTER SAFETIES & FILTERING
@@ -144,8 +149,6 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
                 .build();
 
         waitForStart();
-        resetRuntime();
-        curTime = getRuntime();
         follower.startTeleOpDrive();
 
         /* ---------------- Main Loop ---------------- */
@@ -222,6 +225,8 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
         /* -------- Start shooting sequence -------- */
         if (gamepad1.a && shootState == ShootState.IDLE) {
             shootState = ShootState.ALIGNING;
+            bestHeadingErrorDeg = Double.MAX_VALUE;
+            alignStallCounter = 0;
             smoothedDistanceCm = null;
         }
 
@@ -242,6 +247,14 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
 
         switch (shootState) {
 
+            /* =====================================================
+               ALIGNING
+               -----------------------------------------------------
+               Continues refining heading as long as improvement
+               is possible. Exits only when:
+                 - Error is already acceptable AND
+                 - Further improvement has stalled
+               ===================================================== */
             case ALIGNING: {        // TODO Have Sarah look into this to make it faster
 
                 // Manual override → skip alignment and keep scoring
@@ -252,26 +265,33 @@ public class BLUEMainTeleOpNEW_INTAKE extends LinearOpMode {
 
                 // Horizontal offset from Limelight (degrees)
                 double tx = result.getTx();
-                double error = tx-5;
+                double absError = Math.abs(tx);
 
-                if (Math.abs(error) < angleTolerance) {
-                    rotate = 0;
+                /* ----- Track whether we're still improving ----- */
+                if (absError < bestHeadingErrorDeg - ALIGN_MIN_IMPROVEMENT) {
+                    bestHeadingErrorDeg = absError;
+                    alignStallCounter = 0;
+                } else {
+                    alignStallCounter++;
+                }
+
+                /* ----- Compute turn command ----- */
+                double turn = ALIGN_KP * (-tx);
+
+                // Enforce minimum command if still meaningfully off
+                if (Math.abs(turn) < ALIGN_MIN_CMD &&
+                        absError > ALIGN_ACCEPTABLE_ERROR) {
+                    turn = Math.copySign(ALIGN_MIN_CMD, turn);
+                }
+
+                follower.setTeleOpDrive(0, 0, turn, false, heading);
+
+                /* ----- Exit condition ----- */
+                if (absError <= ALIGN_ACCEPTABLE_ERROR &&
+                        alignStallCounter >= ALIGN_STALL_CYCLES) {
                     shootState = ShootState.SPINNING_UP;
                 }
-                else {
-                    double pTerm = error * ALIGN_KP;
 
-                    curTime = getRuntime();
-                    double dT = curTime -lastTime;
-                    double dTerm = ((error-lastError)/dT) * ALIGN_KD;
-
-                    rotate = Range.clip(pTerm + dTerm + FF, -.3, .3);
-
-                    follower.setTeleOpDrive(0,0,rotate, false);
-
-                    lastError = error;
-                    lastTime=curTime;
-                }
                 break;
             }
 

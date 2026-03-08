@@ -90,10 +90,10 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
 
     private int pathState;
 
-    private final Pose startPose = new Pose(56, 136, Math.toRadians(270)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(56, 89, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(20, 84, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose lineup1Pose = new Pose(41, 84, Math.toRadians(180));
+    private final Pose startPose = new Pose(56, 146, Math.toRadians(270)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(56, 99, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose pickup1Pose = new Pose(20, 94, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose lineup1Pose = new Pose(41, 94, Math.toRadians(180));
 
 
     private Path scorePreload;
