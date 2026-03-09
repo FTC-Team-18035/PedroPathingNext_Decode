@@ -22,11 +22,14 @@ import org.firstinspires.ftc.teamcode.SerqetCode.nextFtc.subsystems.ShooterSubsy
 @Autonomous(name = "Near Blue 1st Spike", group = "Examples", preselectTeleOp = "BLUE Main TeleOp")
 public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
 
-    private static final double SHOOT_SECONDS = 2.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double SHOOT_SECONDS = 1.75;           // TODO: Change this if isn't enough time or too much...6 was too much
+    private static final double INTAKE_DISTANCE = 2275;
     private static final double DRIVE_FORWARD_INCHES = 20.0; //TODO: Change if distance is wrong
-
-    private static final double MAX_DRIVE_SPEED = .6; // Change this for the max speed
-    private static final double MAX_INTAKE_SPEED = .35; // Change this if we need to intake slower
+    public double leftError;
+    public double rightError;
+    private static final double FLYWHEEL_TOLERANCE = 50;
+    private static final double MAX_DRIVE_SPEED = .8; // Change this for the max speed
+    private static final double MAX_INTAKE_SPEED = .5; // Change this if we need to intake slower
     private static final double DRIVE_POWER = 0.7;
     private static final double DRIVE_TIMEOUT_SECONDS = 20.0;
 
@@ -45,7 +48,7 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
 
     /* =========================================================
        ALIGNMENT CONTROL CONSTANTS (matches TeleOp)
-       ========================================================= */
+        ========================================================= */
     private static final double ALIGN_KP = -0.015;
     private static final double ALIGN_MIN_CMD = 0.09;
     private static final double ALIGN_ACCEPTABLE_ERROR = 0.35;
@@ -82,26 +85,32 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
 
     private Double smoothedDistanceCm = null;
     private double targetDistanceCm = DEFAULT_DISTANCE_CM;
+    private boolean pullBackStarted = false;
+    private boolean intaking = false;
+    private boolean startFeeding = false;
+    private boolean intakeReset = false;
 
     private BezierPoint holdPoint = null;
     private double holdHeadingRad = 0.0;
     private boolean holdInitialized = false;
     private Timer pathTimer, actionTimer, opmodeTimer;
+    private ElapsedTime intakeTimer = new ElapsedTime();
 
     private int pathState;
-
+                                // Increased score y by 10
+                                //Increased pickup 1 x by 6
     private final Pose startPose = new Pose(56, 146, Math.toRadians(270)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(56, 99, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(20, 94, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose lineup1Pose = new Pose(41, 94, Math.toRadians(180));
-
+    private final Pose scorePose = new Pose(66, 110, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose pickup1Pose = new Pose(26, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose lineup1Pose = new Pose(52, 100, Math.toRadians(180)); // Increased by 4
+    private final Pose endPose = new Pose(34, 88, Math.toRadians(180));
 
     private Path scorePreload;
     private Path score1Path;
     private Path readyPath;
     private Path lineup1Path;
     private Path pickup1Path;
-    private Path endPose;
+    private Path endPath;
 
 
     public void buildPaths() {
@@ -118,8 +127,8 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
         pickup1Path = new Path(new BezierLine(pickup1Pose, scorePose));
         pickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading(), .8);
 
-       // score1Path = new Path(new BezierLine(scorePose, lineup1Pose ));
-       // score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), lineup1Pose.getHeading(), .5);
+        score1Path = new Path(new BezierLine(scorePose, endPose ));
+        score1Path.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading(), .5);
 
 
     }
@@ -160,8 +169,7 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
 
             case 1_5:
                 if (!follower.isBusy()) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(-.5);
+                    startIntaking();
                     follower.setMaxPower(MAX_INTAKE_SPEED);
                     follower.followPath(lineup1Path);
                     pathTimer.resetTimer();
@@ -169,13 +177,7 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
                 }
                 break;
             case 2:
-                if(pathTimer.getElapsedTimeSeconds() > 2) {
-                    intake.setPower(1);
-                    shooter.setFeedPower(0);
-                }
                 if (!follower.isBusy()) {
-                    intake.setPower(0);
-                    shooter.setFeedPower(0);
 
                     follower.setMaxPower(MAX_DRIVE_SPEED);
                     follower.followPath(pickup1Path);
@@ -185,12 +187,12 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
                 break;
             case 2_5:
                 // if(actionTimer.getElapsedTimeSeconds() > 1) {
-                //     shooter.setFeedPower(0);
+                //     intake.setPower(0);
                 //     intake.setPower(0);
                 // }
                 if(!follower.isBusy()) {
                     shootForTime(SHOOT_SECONDS);
-                    setPathState(-1);
+                    setPathState(3);
                 }
                 break;
             case 3:
@@ -203,7 +205,6 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
             case -1:
                 if (!follower.isBusy()) {
                     intake.setPower(0);
-                    shooter.setFeedPower(0);
                     requestOpModeStop();
                 }
 
@@ -229,6 +230,11 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
         // These loop the movements of the robot, these must be called continuously in order to work
         follower.update();
         autonomousPathUpdate();
+        shooter.update();
+
+        if (intaking) {
+            intake();
+        }
 
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
@@ -292,22 +298,70 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
     public void stop() {
     }
 
+    private void handleIntake(double target) {
+        if (!pullBackStarted) {
+            intake.setPower(0);
+            intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            intake.setTargetPosition(0);
+            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pullBackStarted = true;
+        }
+        else if (pullBackStarted) {
+            if (intake.getCurrentPosition() > target) {
+                intake.setPower(-1);
+                shooter.setTarget(-250, .205);
+            } else {
+                intake.setPower(0);
+                shooter.setTarget(0, .205);
+                pullBackStarted = false;
+            }
+        }
+
+    }
+    private void startIntaking() {
+        resetIntake();
+    }
+    private void resetIntake(){
+        intake.setPower(0);
+        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setTargetPosition(0);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intaking = true;
+    }
+
+    private void intake() {
+        double intakePosition = intake.getCurrentPosition();
+
+        if(intakePosition >= INTAKE_DISTANCE) {
+            intake.setPower(0);
+            intaking = false;
+        }
+        else {
+            intake.setPower(1);
+        }
+    }
+
     private double shootForTime(double seconds) {
         ElapsedTime timer = new ElapsedTime();
 
         while (opmodeTimer.getElapsedTimeSeconds() < 30 && timer.seconds() < seconds + .2) {
             if(timer.seconds() > seconds) {
                 shooter.stop();
+                intake.setPower(0);
+                startFeeding = false;
                 //stopShoot();
             }
             else {
                 //intake.setPower(1);
+
                 follower.update();
                 updateHold();
 
                 updateDistanceAndShooterTarget();
 
-                shooter.setFeedPower(-1.0); // matches BLUEMainTeleOpWORKING feeding direction
+                if(startFeeding) {
+                    intake.setPower(1);
+                }
                 shooter.update();
 
                 telemetry.addData("Shooting (s)", timer.seconds());
@@ -347,6 +401,16 @@ public class Serqet_Auto_Near_Blue_1stSpike extends OpMode {
         double targetVelocity = TrajectorySCRIMMAGE.CalculateVelocity(targetDistanceCm);
         double targetAngle = TrajectorySCRIMMAGE.CalculateAngle(targetDistanceCm);
         shooter.setTarget(targetVelocity, targetAngle);
+
+        leftError = Math.abs(Math.abs(
+                shooter.getLeftVelocity()) - targetVelocity);
+        rightError = Math.abs(Math.abs(
+                shooter.getRightVelocity()) - targetVelocity);
+
+        if (leftError < FLYWHEEL_TOLERANCE ||
+                rightError < FLYWHEEL_TOLERANCE) {
+            startFeeding = true;
+        }
     }
 
     private void beginHoldFromCurrentPose() {
