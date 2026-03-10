@@ -380,6 +380,7 @@ public class REDMainTeleOpNEW_INTAKE extends LinearOpMode {
             } else {
                 intake.setPower(0);
                 shooter.setTarget(0, .205);
+                pullBackStarted = false;
             }
         }
 
