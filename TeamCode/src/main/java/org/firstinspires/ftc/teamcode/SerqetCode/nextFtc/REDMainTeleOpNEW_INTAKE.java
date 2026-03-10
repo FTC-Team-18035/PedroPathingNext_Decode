@@ -68,7 +68,7 @@ public class REDMainTeleOpNEW_INTAKE extends LinearOpMode {
     // Telemetry values
     public double leftError;
     public double rightError;
-    public double pullBackTicks = 0;
+    public double pullBackTicks = -60;
 
     /* =========================================================
        HARDWARE
