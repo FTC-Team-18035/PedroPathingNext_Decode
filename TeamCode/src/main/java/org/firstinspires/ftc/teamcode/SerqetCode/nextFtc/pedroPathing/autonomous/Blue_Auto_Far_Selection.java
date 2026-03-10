@@ -2929,10 +2929,10 @@ class Near_Blue_3rdSpike extends OpMode {
     //private final Pose score2Pose = new Pose(61,13 , Math.toRadians(125));
     private final Pose pickup1Pose = new Pose(26, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose pickup2Pose = new Pose(26,76, Math.toRadians(180));
-    private final Pose pickup3Pose = new Pose(15, 45, Math.toRadians(180));
+    private final Pose pickup3Pose = new Pose(26, 52, Math.toRadians(180));
     private final Pose lineup1Pose = new Pose(52, 100, Math.toRadians(180));
     private final Pose lineup2Pose = new Pose(52, 76, Math.toRadians(180));
-    private final Pose lineup3Pose = new Pose(42, 45, Math.toRadians(180));
+    private final Pose lineup3Pose = new Pose(52, 52, Math.toRadians(180));
     private final Pose endPose = new Pose(34, 88, Math.toRadians(180));
 
 

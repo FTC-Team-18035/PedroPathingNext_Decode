@@ -2000,11 +2000,12 @@ class Near_Red_1stSpike extends OpMode {
     private int pathState;
     // Increased score y by 10
     //Increased pickup 1 x by 6
-    private final Pose startPose = new Pose(56, 146, Math.toRadians(270)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(66, 110, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(26, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose lineup1Pose = new Pose(52, 100, Math.toRadians(180)); // Increased by 4
-    private final Pose endPose = new Pose(34, 88, Math.toRadians(180));
+    private final Pose startPose = new Pose(88, 146, Math.toRadians(270)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(78, 110, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    //private final Pose score2Pose = new Pose(61,13 , Math.toRadians(125));
+    private final Pose pickup1Pose = new Pose(118, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose lineup1Pose = new Pose(92, 100, Math.toRadians(180));
+    private final Pose endPose = new Pose(100, 88, Math.toRadians(180));
 
     private Path scorePreload;
     private Path score1Path;
@@ -2434,13 +2435,13 @@ class Near_Red_2ndSpike extends OpMode {
     private int pathState;
     // Increased score y by 10
     //Increased pickup 1 x by 6
-    private final Pose startPose = new Pose(56, 146, Math.toRadians(270)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(66, 110, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose pickup1Pose = new Pose(26, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose lineup1Pose = new Pose(52, 100, Math.toRadians(180)); // Increased by 4
-    private final Pose pickup2Pose = new Pose(26,76, Math.toRadians(180));  // Increased x by 8
-    private final Pose lineup2Pose = new Pose(52, 76, Math.toRadians(180)); // Increased by 4
-    private final Pose endPose = new Pose(34, 88, Math.toRadians(180));
+    private final Pose startPose = new Pose(88, 146, Math.toRadians(270)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(78, 110, Math.toRadians(138));
+    private final Pose pickup1Pose = new Pose(118, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup2Pose = new Pose(118,76, Math.toRadians(180));
+    private final Pose lineup1Pose = new Pose(92, 100, Math.toRadians(180));
+    private final Pose lineup2Pose = new Pose(92, 76, Math.toRadians(180));
+    private final Pose endPose = new Pose(100, 88, Math.toRadians(180));
 
     private Path scorePreload;
     private Path score1Path;
@@ -2917,16 +2918,16 @@ class Near_Red_3rdSpike extends OpMode {
 
     private int pathState;
 
-    private final Pose startPose = new Pose(56, 146, Math.toRadians(270)); // Start Pose of our robot.
-    private final Pose score1Pose = new Pose(66, 110, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose startPose = new Pose(88, 146, Math.toRadians(270)); // Start Pose of our robot.
+    private final Pose score1Pose = new Pose(78, 110, Math.toRadians(138)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     //private final Pose score2Pose = new Pose(61,13 , Math.toRadians(125));
-    private final Pose pickup1Pose = new Pose(26, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(26,76, Math.toRadians(180));
-    private final Pose pickup3Pose = new Pose(15, 45, Math.toRadians(180));
-    private final Pose lineup1Pose = new Pose(52, 100, Math.toRadians(180));
-    private final Pose lineup2Pose = new Pose(52, 76, Math.toRadians(180));
-    private final Pose lineup3Pose = new Pose(42, 45, Math.toRadians(180));
-    private final Pose endPose = new Pose(34, 88, Math.toRadians(180));
+    private final Pose pickup1Pose = new Pose(118, 100, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup2Pose = new Pose(118,76, Math.toRadians(180));
+    private final Pose pickup3Pose = new Pose(118, 52, Math.toRadians(180));
+    private final Pose lineup1Pose = new Pose(92, 100, Math.toRadians(180));
+    private final Pose lineup2Pose = new Pose(92, 76, Math.toRadians(180));
+    private final Pose lineup3Pose = new Pose(92, 52, Math.toRadians(180));
+    private final Pose endPose = new Pose(100, 88, Math.toRadians(180));
 
 
 
