@@ -2167,7 +2167,7 @@ class Near_Red_1stSpike extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); // matches BLUEMainTeleOpWORKING
+        limelight.pipelineSwitch(8); // matches BLUEMainTeleOpWORKING
         limelight.start();
 
         buildPaths();
@@ -2651,7 +2651,7 @@ class Near_Red_2ndSpike extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); // matches BLUEMainTeleOpWORKING
+        limelight.pipelineSwitch(8); // matches BLUEMainTeleOpWORKING
         limelight.start();
 
         buildPaths();
@@ -3189,7 +3189,7 @@ class Near_Red_3rdSpike extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(6); // matches BLUEMainTeleOpWORKING
+        limelight.pipelineSwitch(8); // matches BLUEMainTeleOpWORKING
         limelight.start();
 
         buildPaths();
